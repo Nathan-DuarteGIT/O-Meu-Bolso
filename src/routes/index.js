@@ -1,7 +1,7 @@
 // Rotas da página principal e dashboard
 
 import express from 'express';
-import homeController from '../controllers/homeController.js';
+import homeController from '../controllers/homecontroller.js';
 
 const router = express.Router();
 
