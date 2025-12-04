@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 
 // Importa as rotas
 import indexRouter from './src/routes/index.js';
+import authRouter from './src/routes/auth.js';
 
 // --- CONFIGURAÇÃO INICIAL DO EXPRESS ---
 const app = express();
@@ -44,6 +45,8 @@ app.set('view engine', 'html'); // Define o HTML como o motor de views padrão
 
 // --- ROTAS DA APLICAÇÃO ---
 app.use('/', indexRouter);
+app.use('/', authRouter);
+
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(PORT, () => {
