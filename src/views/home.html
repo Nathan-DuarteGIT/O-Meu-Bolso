@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título atualizado para 'Home' -->
+    <title>Minhas Finanças - Bem-Vindo</title> 
+    <!-- Inclui o Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do Tailwind para usar cores e fontes customizadas se necessário -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Define a fonte Inter globalmente */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Cabeçalho (Header) -->
+    <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">
+                <span class="mr-2">💰</span> Minhas Finanças
+            </h1>
+            <nav>
+                <a href="/login" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">Login</a>
+                <a href="/register" class="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 ease-in-out shadow-lg">Cadastrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Hero Section / Landing Message -->
+            <section class="text-center py-16 bg-white rounded-xl shadow-lg mb-8 border-t-4 border-indigo-500">
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">
+                    Tome o Controle das Suas Finanças
+                </h2>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Acompanhe receitas e despesas, defina orçamentos e alcance seus objetivos de poupança com facilidade.
+                </p>
+                <div class="space-x-4">
+                    <button onclick="window.location.href='/register'" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-300 transform hover:scale-105">
+                        Começar Agora
+                    </button>
+                    <a href="#features" class="text-indigo-600 hover:text-indigo-700 font-medium py-3 px-8 transition duration-300">
+                        Ver Recursos
+                    </a>
+                </div>
+            </section>
+
+            <!-- Feature Highlights Section -->
+            <section id="features" class="grid md:grid-cols-3 gap-8 pt-8">
+                
+                <!-- Feature 1: Gestão de Transações -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 hover:shadow-xl transition duration-300">
+                    <div class="text-3xl text-yellow-500 mb-3">📋</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Gestão Completa de Movimentos</h3>
+                    <p class="text-gray-600">Adicione, edite e categorize todas as suas despesas e receitas, incluindo o registo de recibos digitais.</p>
+                </div>
+
+                <!-- Feature 2: Dashboard -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500 hover:shadow-xl transition duration-300">
+                    <div class="text-3xl text-purple-500 mb-3">📊</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Dashboard Intuitivo</h3>
+                    <p class="text-gray-600">Visualize seu saldo atual e a distribuição dos seus gastos através de gráficos de pizza e barras.</p>
+                </div>
+
+                <!-- Feature 3: Orçamento e Poupança -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-sky-500 hover:shadow-xl transition duration-300">
+                    <div class="text-3xl text-sky-500 mb-3">🎯</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Orçamentos e Metas</h3>
+                    <p class="text-gray-600">Defina limites de gasto por categoria e acompanhe o progresso das suas metas de poupança com barras visuais.</p>
+                </div>
+
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- Rodapé (Footer) -->
+    <footer class="bg-gray-800 text-white mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-400">
+            &copy; 2025 Minhas Finanças Pessoais. Construído com Express, Supabase e Tailwind CSS.
+        </div>
+    </footer>
+
+</body>
+</html>
