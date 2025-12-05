@@ -1,36 +1,28 @@
+// Controlador para Lógica de Autenticação (Login e Registro)
 import express from 'express'; 
 import { signUp, signIn, signOut } from '../services/authService.js';
 
-/**
- * Renderiza a página de login.
- * @param {express.Request} req
- * @param {express.Response} res
- */
-export const renderLoginPage = (req, res) => {
-    try {
-        // Renderiza o ficheiro 'login.html'
-        res.render('login.html', { 
-            title: "Entrar - Minhas Finanças"
-        });
-    } catch (error) {
-        console.error("Erro ao renderizar a página de login:", error);
-        res.status(500).send("Erro interno ao carregar a página.");
-    }
-};
+
+// --- VISUALIZAÇÃO DE FORMULÁRIOS ---
 
 /**
- * Renderiza a página de registro.
+ * Renderiza a página unificada de Login/Registo.
+ * Lê o query parameter 'mode' (ex: ?mode=register) para definir o estado inicial.
  * @param {express.Request} req
  * @param {express.Response} res
  */
-export const renderRegisterPage = (req, res) => {
+export const renderAuthPage = (req, res) => {
     try {
-        // Renderiza o ficheiro 'register.html'
-        res.render('register.html', { 
-            title: "Criar Conta - Minhas Finanças"
+        // Obtém o modo inicial da URL (default é 'login')
+        const initialMode = req.query.mode || 'login';
+
+        // Renderiza o ficheiro 'auth.html'
+        res.render('auth.html', { 
+            title: initialMode === 'login' ? "Login - O Meu Bolso" : "Registo - O Meu Bolso",
+            initialMode: initialMode // Futuramente, podemos passar isso para o JS
         });
     } catch (error) {
-        console.error("Erro ao renderizar a página de registro:", error);
+        console.error("Erro ao renderizar a página de autenticação:", error);
         res.status(500).send("Erro interno ao carregar a página.");
     }
 };
@@ -129,8 +121,7 @@ export const logoutUser = async (req, res) => {
 }
 
 export default { 
-    renderLoginPage, 
-    renderRegisterPage, 
+    renderAuthPage, 
     loginUser, 
     registerUser,
     logoutUser // Adicionei a função de logout para futura referência

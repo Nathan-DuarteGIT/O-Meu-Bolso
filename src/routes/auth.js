@@ -9,11 +9,10 @@ const router = express.Router();
 // ROTAS DE VISUALIZAÇÃO (GET)
 // ----------------------------------------------------
 
-// GET /login: Exibe o formulário de login
-router.get('/login', authController.renderLoginPage);
-
-// GET /register: Exibe o formulário de registro
-router.get('/register', authController.renderRegisterPage);
+// GET /login OU GET /register
+// Ambos os caminhos levam ao mesmo Controller, que usa a query string (?mode=register)
+router.get('/login', authController.renderAuthPage);
+router.get('/register', authController.renderAuthPage);
 
 // ----------------------------------------------------
 // ROTAS DE AÇÃO (POST) - Será implementado depois com Supabase
