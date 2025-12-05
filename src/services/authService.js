@@ -2,7 +2,7 @@
 // Lógica de Negócios para Autenticação usando Supabase
 
 // Importa a instância do cliente Supabase que configurámos
-import supabase from '../config/supabaseConfig.js';
+import supabase from '../config/supabase.js';
 
 /**
  * Registra um novo utilizador no Supabase.
