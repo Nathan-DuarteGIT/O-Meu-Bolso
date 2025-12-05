@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Registo - O Meu Bolso</title>
+    <!-- Carregamento do Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Define a fonte Inter como padrão */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .auth-container {
+            /* Garante que o container preenche a altura mínima da viewport */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+    </style>
+    <script>
+        // Configuração customizada do Tailwind para a paleta de cores
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Paleta de Cores do Utilizador
+                        'navy': '#14213D',
+                        'gold': '#FCA311',
+                        'light-gray': '#E5E5E5',
+                        'white': '#FFFFFF',
+                        'black': '#000000',
+                    },
+                }
+            }
+        }
+    </script>
+
+    
+
+</head>
+<body class="bg-navy text-white antialiased">
+
+    <div class="auth-container">
+        
+        <!-- Formulário Unificado de Autenticação -->
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 md:p-10 border-4 border-gold text-navy">
+            
+            <!-- Título Principal (Atualizado pelo JS) -->
+            <div class="flex justify-center items-center mb-6">
+                <svg class="w-10 h-10 text-gold mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <h2 id="auth-title" class="text-3xl font-extrabold text-navy">Login</h2>
+            </div>
+            
+            <!-- Botões de Alternância Login / Registo -->
+            <div class="flex mb-8 border-b border-light-gray">
+                <button id="tab-login" class="flex-1 py-3 text-lg font-bold transition duration-300" onclick="showForm('login')">
+                    Entrar
+                </button>
+                <button id="tab-register" class="flex-1 py-3 text-lg font-bold transition duration-300" onclick="showForm('register')">
+                    Registo
+                </button>
+            </div>
+
+            <!-- Formulário de Login -->
+            <form id="form-login" class="space-y-6">
+                <h3 class="text-xl font-semibold text-navy text-center mb-4">Bem-vindo de Volta!</h3>
+                
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-navy">E-mail</label>
+                    <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-light-gray rounded-lg shadow-sm focus:border-gold focus:ring-gold transition duration-200 text-navy placeholder-light-gray" placeholder="seu.email@exemplo.com">
+                </div>
+                
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-navy">Palavra-passe</label>
+                    <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-light-gray rounded-lg shadow-sm focus:border-gold focus:ring-gold transition duration-200 text-navy placeholder-light-gray" placeholder="••••••••">
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <a href="#" class="text-sm font-medium text-navy hover:text-gold transition duration-200">Esqueceu a Palavra-passe?</a>
+                </div>
+                
+                <button type="submit" class="w-full bg-navy text-gold font-bold py-3 rounded-xl hover:bg-black transition duration-300 shadow-lg">
+                    Entrar na Conta
+                </button>
+
+                <p class="text-center text-sm text-navy pt-2">
+                    Não tem uma conta? 
+                    <a href="#" class="font-bold text-gold hover:text-navy transition duration-200" onclick="showForm('register'); return false;">Registe-se aqui</a>
+                </p>
+            </form>
+
+            <!-- Formulário de Registo (Inicialmente oculto) -->
+            <form id="form-register" class="space-y-6 hidden">
+                <h3 class="text-xl font-semibold text-navy text-center mb-4">Crie a Sua Conta</h3>
+                
+                <div>
+                    <label for="register-name" class="block text-sm font-medium text-navy">Nome Completo</label>
+                    <input type="text" id="register-name" name="name" required class="mt-1 block w-full px-4 py-2 border border-light-gray rounded-lg shadow-sm focus:border-gold focus:ring-gold transition duration-200 text-navy placeholder-light-gray" placeholder="O seu nome">
+                </div>
+                
+                <div>
+                    <label for="register-email" class="block text-sm font-medium text-navy">E-mail</label>
+                    <input type="email" id="register-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-light-gray rounded-lg shadow-sm focus:border-gold focus:ring-gold transition duration-200 text-navy placeholder-light-gray" placeholder="seu.email@exemplo.com">
+                </div>
+                
+                <div>
+                    <label for="register-password" class="block text-sm font-medium text-navy">Palavra-passe</label>
+                    <input type="password" id="register-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-light-gray rounded-lg shadow-sm focus:border-gold focus:ring-gold transition duration-200 text-navy placeholder-light-gray" placeholder="Mínimo 8 caracteres">
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms" required class="h-4 w-4 text-gold border-light-gray rounded focus:ring-gold checked:bg-gold checked:border-transparent">
+                    <label for="terms" class="ml-2 block text-sm text-navy">
+                        Concordo com os <a href="#" class="font-medium text-navy hover:text-gold transition duration-200">Termos e Condições</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-gold text-navy font-bold py-3 rounded-xl hover:bg-opacity-90 transition duration-300 shadow-lg">
+                    Criar Nova Conta
+                </button>
+
+                <p class="text-center text-sm text-navy pt-2">
+                    Já tem uma conta? 
+                    <a href="#" class="font-bold text-gold hover:text-navy transition duration-200" onclick="showForm('login'); return false;">Entrar</a>
+                </p>
+            </form>
+
+            <p class="text-center text-xs mt-6 text-light-gray">
+                <a href="index.html" class="hover:text-navy transition duration-200">&larr; Voltar à Landing Page</a>
+            </p>
+        </div>
+    </div>
+    <script src="/js/auth.js"></script>
+</body>
+</html>
