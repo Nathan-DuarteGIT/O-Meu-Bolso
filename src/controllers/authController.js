@@ -95,6 +95,21 @@ export const loginUser = async (req, res) => {
         
         // A resposta do Supabase geralmente vem em data.user e data.session
         const user = data.user;
+
+        // --- NOVA VERIFICAÇÃO DE SEGURANÇA ---
+        // Verifica se o email foi confirmado. 
+        // Se email_confirmed_at for null, bloqueia o acesso.
+        if (!user.email_confirmed_at) {
+            // Opcional: Podes fazer logout imediato no supabase para limpar a sessão lá
+            // await supabase.auth.signOut(); 
+
+            return res.status(403).send(`
+                <h1>Conta não verificada</h1>
+                <p>Por favor, verifique a sua caixa de entrada (e spam) e clique no link de confirmação enviado para <strong>${email}</strong> antes de fazer login.</p>
+                <a href="/login">Voltar ao Login</a>
+            `);
+        }
+        // -------------------------------------
         
         // Tenta obter o nome dos metadados do Supabase ou usa um fallback
         const userName = user.user_metadata?.name || user.user_metadata?.full_name || "Utilizador";
