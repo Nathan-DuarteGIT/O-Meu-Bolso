@@ -5,16 +5,37 @@ import { signUp, signIn, signOut } from '../services/authService.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'segredo_super_secreto_muda_isto';
 
 // --- VISUALIZAÇÃO DE FORMULÁRIOS ---
-export const renderAuthPage = (req, res) => {
+export const renderAuthPage = async (req, res) => {
     // Verifica se já existe um token válido no cookie
     const token = req.cookies?.token;
 
     if (token) {
         try {
-            jwt.verify(token, JWT_SECRET);
-            return res.redirect('/dashboard');
+            const decoded = jwt.verify(token, JWT_SECRET);
+            
+            // --- VERIFICAÇÃO ADICIONAL ---
+            // Mesmo que o token JWT seja válido, verificamos no Supabase se o email está confirmado.
+            // Isto previne que users acabados de registar (com token) entrem sem validar o email.
+            // Nota: 'supabase' deve estar configurado com service_role para usar admin.getUserById
+            const { data, error } = await supabase.auth.admin.getUserById(decoded.id);
+
+            if (data && data.user) {
+                if (data.user.email_confirmed_at) {
+                    // Email confirmado e token válido: Redireciona para Dashboard
+                    return res.redirect('/dashboard');
+                } else {
+                    // Tem token mas email NÃO confirmado:
+                    // Apaga o cookie para impedir o loop e força a ver a página de login
+                    res.clearCookie('token');
+                    console.log(`Bloqueado acesso ao dashboard para ${decoded.email}: Email não verificado.`);
+                }
+            } else {
+                // Se não encontrou o user (foi apagado?), limpa o token
+                res.clearCookie('token');
+            }
         } catch (e) {
             // Token inválido, continua para mostrar a página de login
+            // (O cookie inválido será substituído num novo login ou ignorado)
         }
     }
     
