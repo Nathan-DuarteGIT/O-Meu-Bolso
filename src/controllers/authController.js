@@ -1,11 +1,20 @@
 // src/controllers/authController.js
 // Controlador para Lógica de Autenticação (Login e Registro)
-
+import express from 'express'; 
 import { signUp, signIn, signOut } from '../services/authService.js';
 
 // --- VISUALIZAÇÃO DE FORMULÁRIOS ---
+/**
+ * Renderiza a página unificada de Login/Registo.
+ */
 export const renderAuthPage = (req, res) => {
+    // Se o utilizador já estiver autenticado, redireciona para o dashboard
+    if (req.session.userId) {
+        return res.redirect('/dashboard');
+    }
+    
     try {
+        // Obtém o modo inicial da URL (default é 'login')
         const initialMode = req.query.mode || 'login';
         res.render('auth.html', {
             title: initialMode === 'login' ? "Login - O Meu Bolso" : "Registo - O Meu Bolso",
@@ -18,109 +27,113 @@ export const renderAuthPage = (req, res) => {
 };
 
 // --- REGISTO ---
+/**
+ * Lida com a submissão do formulário de registro.
+ */
 export const registerUser = async (req, res) => {
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {
-        return res.status(400).json({ message: 'Preencha todos os campos.' });
+        return res.status(400).send('Por favor, preencha todos os campos.');
     }
 
     try {
         const { user, session, error } = await signUp(email, password, name);
 
         if (error) {
-            console.error('Erro no registo Supabase:', error.message);
-            return res.status(400).json({ message: error.message });
+            console.error('Erro de registro:', error.message);
+            return res.status(400).send(`Falha no registro: ${error.message}`);
         }
 
-        // Se o Supabase já criar sessão (sem confirmação de email), guarda-a
-        if (session) {
-            req.session.user = {
-                id: user.id,
-                email: user.email,
-                name: user.user_metadata?.full_name || name,
-                access_token: session.access_token,
-                refresh_token: session.refresh_token
-            };
+        if (session && user) {
+            // SUCESSO DE REGISTRO E LOGIN IMEDIATO: 
+            // 1. Armazena o ID e o token do Supabase na sessão do Express
+            req.session.userId = user.id;
+            req.session.accessToken = session.access_token;
+            
+            return res.redirect('/dashboard'); 
+        } else {
+            // Se o Supabase exigir confirmação de email (nenhuma sessão criada)
+            // O frontend trata esta mensagem de sucesso
+            return res.status(200).send("Registo efetuado com sucesso! Verifique o seu email para confirmar a conta.");
         }
 
-        // Resposta para fetch (JSON) ou formulário normal
-        if (req.headers.accept?.includes('application/json')) {
-            return res.status(201).json({ message: 'Registado com sucesso!' });
-        }
-
-        res.redirect('/login?mode=login');
     } catch (err) {
-        console.error('Erro inesperado no registo:', err);
-        res.status(500).json({ message: 'Erro interno do servidor.' });
+        console.error('Erro interno durante o registro:', err);
+        return res.status(500).send('Erro interno do servidor durante o registro.');
     }
 };
 
 // --- LOGIN ---
+/**
+ * Lida com a submissão do formulário de login.
+ */
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
+        return res.status(400).send('Por favor, preencha o email e a senha.');
     }
 
     try {
         const { session, error } = await signIn(email, password);
 
-        if (error || !session) {
-            console.error('Login falhou:', error?.message || 'Sessão não criada');
-            return res.status(401).json({ 
-                message: error?.message || 'Credenciais inválidas.' 
-            });
+        if (error) {
+            console.error('Erro de login:', error.message);
+            return res.status(401).send(`Falha no login: ${error.message}`);
         }
+        
+        // SUCESSO DE LOGIN:
+        // 1. Armazena o ID e o token do Supabase na sessão do Express
+        req.session.userId = session.user.id;
+        req.session.accessToken = session.access_token;
 
-        // Tudo certo – guarda na sessão Express
-        req.session.user = {
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-            access_token: session.access_token,
-            refresh_token: session.refresh_token
-        };
+        return res.redirect('/dashboard');
 
-        // Responde conforme o cliente pedir
-        if (req.headers.accept?.includes('application/json')) {
-            return res.json({ message: 'Login bem-sucedido' });
-        }
-
-        res.redirect('/dashboard');
     } catch (err) {
-        console.error('Erro inesperado no login:', err);
-        res.status(500).json({ message: 'Erro interno do servidor.' });
+        console.error('Erro interno durante o login:', err);
+        return res.status(500).send('Erro interno do servidor durante o login.');
     }
 };
+
 
 // --- LOGOUT ---
+/**
+ * Lida com o término da sessão.
+ */
 export const logoutUser = async (req, res) => {
     try {
-        if (req.session.user?.access_token) {
-            await signOut(); 
-        }
-    } catch (e) {
-        console.error('Erro ao fazer logout no Supabase:', e);
+        await signOut();
+        
+        req.session.destroy(err => {
+            if (err) {
+                console.error('Erro ao destruir sessão do Express:', err);
+            }
+            res.redirect('/');
+        });
+        
+    } catch (err) {
+        console.error('Erro interno durante o logout:', err);
+        res.redirect('/');
     }
-
-    req.session.destroy((err) => {
-        if (err) console.error('Erro ao destruir sessão:', err);
-        res.redirect('/login');
-    });
-};
+}
 
 // --- MIDDLEWARE DE PROTEÇÃO ---
+/**
+ * Middleware para garantir que o utilizador está autenticado (tem uma sessão ativa).
+ */
 export const requireAuth = (req, res, next) => {
-    if (req.session?.user) {
-        req.user = req.session.user; 
+    // Verifica se a sessão tem um ID de utilizador válido
+    if (req.session?.userId) {
+        // Adiciona o ID de utilizador ao request para ser facilmente acessível em Controllers
+        req.userId = req.session.userId;
         return next();
     }
+    // Se não estiver autenticado, redireciona para a página de login
     res.redirect('/login');
 };
 
-// Exportação padrão (caso precises)
+// Exportação padrão 
 export default {
     renderAuthPage,
     loginUser,
