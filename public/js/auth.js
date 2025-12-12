@@ -29,7 +29,7 @@ function showForm(mode) {
 
     tabLogin.className = `flex-1 py-3 text-lg font-bold transition duration-300 ${isLogin ? activeClasses : inactiveClasses}`;
     tabRegister.className = `flex-1 py-3 text-lg font-bold transition duration-300 ${!isLogin ? activeClasses : inactiveClasses}`;
-    
+
     // 3. Atualiza a URL no navegador para persistir o estado após o refresh
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('mode', mode);
@@ -49,4 +49,37 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("Função showForm não definida. Verifique a ordem dos scripts.");
     }
+
+    // LOGIN (funciona com redirect ou JSON)
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        const txt = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'A entrar...';
+
+        try {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (res.ok || res.redirected) {
+                window.location.href = '/dashboard';
+            } else {
+                const data = await res.json();
+                alert(data.message || 'Erro no login');
+                btn.disabled = false;
+                btn.textContent = txt;
+            }
+        } catch {
+            alert('Sem ligação ao servidor');
+            btn.disabled = false;
+            btn.textContent = txt;
+        }
+    });
 });
