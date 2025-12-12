@@ -1,18 +1,19 @@
 // src/controllers/authController.js
-import express from 'express';
+// Controlador para Lógica de Autenticação (Login e Registro)
+
 import { signUp, signIn, signOut } from '../services/authService.js';
 
 // --- VISUALIZAÇÃO DE FORMULÁRIOS ---
 export const renderAuthPage = (req, res) => {
     try {
         const initialMode = req.query.mode || 'login';
-        res.render('auth.html', { 
+        res.render('auth.html', {
             title: initialMode === 'login' ? "Login - O Meu Bolso" : "Registo - O Meu Bolso",
             initialMode
         });
     } catch (error) {
-        console.error("Erro ao renderizar auth:", error);
-        res.status(500).send("Erro interno.");
+        console.error("Erro ao renderizar a página de autenticação:", error);
+        res.status(500).send("Erro interno ao carregar a página.");
     }
 };
 
@@ -28,63 +29,68 @@ export const registerUser = async (req, res) => {
         const { user, session, error } = await signUp(email, password, name);
 
         if (error) {
+            console.error('Erro no registo Supabase:', error.message);
             return res.status(400).json({ message: error.message });
         }
 
-        // Se o Supabase confirmar email automaticamente, já cria sessão
+        // Se o Supabase já criar sessão (sem confirmação de email), guarda-a
         if (session) {
             req.session.user = {
                 id: user.id,
                 email: user.email,
-                name: user.user_metadata?.name || name,
+                name: user.user_metadata?.full_name || name,
                 access_token: session.access_token,
                 refresh_token: session.refresh_token
             };
         }
 
-        // Resposta JSON para fetch ou redirect normal
+        // Resposta para fetch (JSON) ou formulário normal
         if (req.headers.accept?.includes('application/json')) {
             return res.status(201).json({ message: 'Registado com sucesso!' });
         }
+
         res.redirect('/login?mode=login');
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Erro interno no servidor.' });
+        console.error('Erro inesperado no registo:', err);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 };
 
-// --- LOGIN (versão final com sessão Express) ---
+// --- LOGIN ---
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email e senha obrigatórios.' });
+        return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
     }
 
     try {
-        const { data, error } = await signIn(email, password);
+        const { session, error } = await signIn(email, password);
 
-        if (error || !data.session) {
-            return res.status(401).json({ message: 'Credenciais inválidas.' });
+        if (error || !session) {
+            console.error('Login falhou:', error?.message || 'Sessão não criada');
+            return res.status(401).json({ 
+                message: error?.message || 'Credenciais inválidas.' 
+            });
         }
 
-        // SESSÃO EXPRESS SEGURA
+        // Tudo certo – guarda na sessão Express
         req.session.user = {
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.user_metadata?.name || data.user.email.split('@')[0],
-            access_token: data.session.access_token,
-            refresh_token: data.session.refresh_token
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+            access_token: session.access_token,
+            refresh_token: session.refresh_token
         };
 
-        // Resposta para fetch (JSON) ou formulário normal (redirect)
+        // Responde conforme o cliente pedir
         if (req.headers.accept?.includes('application/json')) {
             return res.json({ message: 'Login bem-sucedido' });
         }
 
         res.redirect('/dashboard');
     } catch (err) {
-        console.error('Erro no login:', err);
+        console.error('Erro inesperado no login:', err);
         res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 };
@@ -93,20 +99,32 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     try {
         if (req.session.user?.access_token) {
-            await signOut(req.session.user.access_token);
+            await signOut(); 
         }
-    } catch (e) { /* ignorar */ }
-    req.session.destroy();
-    res.redirect('/login');
+    } catch (e) {
+        console.error('Erro ao fazer logout no Supabase:', e);
+    }
+
+    req.session.destroy((err) => {
+        if (err) console.error('Erro ao destruir sessão:', err);
+        res.redirect('/login');
+    });
 };
 
 // --- MIDDLEWARE DE PROTEÇÃO ---
 export const requireAuth = (req, res, next) => {
     if (req.session?.user) {
-        req.user = req.session.user; // disponibiliza para as rotas
+        req.user = req.session.user; 
         return next();
     }
     res.redirect('/login');
 };
 
-export default { renderAuthPage, loginUser, registerUser, logoutUser, requireAuth };
+// Exportação padrão (caso precises)
+export default {
+    renderAuthPage,
+    loginUser,
+    registerUser,
+    logoutUser,
+    requireAuth
+};
