@@ -24,19 +24,21 @@
     </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif; }
- ::-webkit-scrollbar {
-                width: 8px;
-            }
+            font-family: 'Inter', sans-serif;
+        }
 
-            ::-webkit-scrollbar-track {
-                background: #14213D;
-            }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
 
-            ::-webkit-scrollbar-thumb {
-                background: #FCA311;
-                border-radius: 4px;
-            }
+        ::-webkit-scrollbar-track {
+            background: #14213D;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #FCA311;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -70,7 +72,7 @@
         <!-- Welcome -->
         <div class="mb-10">
             <h1 class="text-4xl md:text-5xl font-extrabold">
-                Bem-vindo de volta, <span class="text-gold">Teste!</span>
+                Bem-vindo de volta, <span id="userName" class="text-gold">carregando...</span>!
             </h1>
             <p class="text-light-gray mt-2">Aqui está o resumo das suas finanças hoje:</p>
         </div>
@@ -228,6 +230,16 @@
             <p>&copy; 2025 O Meu Bolso. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script>
+        fetch('/api/user')
+            .then(r => r.json())
+            .then(data => {
+                const el = document.getElementById('userName');
+                if (el) el.textContent = data.name.split(' ')[0];
+            })
+            .catch(() => location.href = '/login');
+    </script>
 
 </body>
 
