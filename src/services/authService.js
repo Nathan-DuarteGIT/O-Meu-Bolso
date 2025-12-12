@@ -1,14 +1,9 @@
-// src/services/authService.js
 // Lógica de Negócios para Autenticação usando Supabase
-
-// Importa a instância do cliente Supabase que configurámos
-import supabase from '../config/supabaseConfig.js';
+import supabase from '../config/supabase.js';
 
 /**
  * Registra um novo utilizador no Supabase.
- * @param {string} email - O email do utilizador.
- * @param {string} password - A senha do utilizador.
- * @param {string} name - O nome a ser incluído nos metadados do utilizador.
+ * Retorna { user, session, error } diretamente, conforme esperado pelo Controller.
  */
 export async function signUp(email, password, name) {
     try {
@@ -17,7 +12,7 @@ export async function signUp(email, password, name) {
             password: password,
             options: {
                 data: {
-                    full_name: name,
+                    full_name: name, // Guarda o nome nos metadados
                 },
             },
         });
@@ -27,6 +22,7 @@ export async function signUp(email, password, name) {
             return { user: null, session: null, error: error };
         }
 
+        // Retorna user e session separados para facilitar a desestruturação no controller
         return { user: data.user, session: data.session, error: null };
 
     } catch (err) {
@@ -37,8 +33,7 @@ export async function signUp(email, password, name) {
 
 /**
  * Inicia a sessão de um utilizador no Supabase.
- * @param {string} email - O email do utilizador.
- * @param {string} password - A senha do utilizador.
+ * CORREÇÃO: Agora retorna o objeto 'data' completo (com user e session).
  */
 export async function signIn(email, password) {
     try {
@@ -49,14 +44,17 @@ export async function signIn(email, password) {
 
         if (error) {
             console.error('Erro no Supabase SignIn:', error);
-            return { session: null, error: error };
+            // Retorna data null para manter a consistência
+            return { data: null, error: error };
         }
 
-        return { session: data.session, error: null };
+        // ALTERADO AQUI:
+        // Retornamos { data, error } para combinar com o "const { data, error } = await signIn..." do Controller
+        return { data: data, error: null };
 
     } catch (err) {
         console.error('Erro inesperado durante o login:', err);
-        return { session: null, error: { message: 'Erro interno do servidor.' } };
+        return { data: null, error: { message: 'Erro interno do servidor.' } };
     }
 }
 

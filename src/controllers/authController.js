@@ -1,20 +1,24 @@
-// src/controllers/authController.js
-// Controlador para Lógica de Autenticação (Login e Registro)
-import express from 'express'; 
+import jwt from 'jsonwebtoken';
 import { signUp, signIn, signOut } from '../services/authService.js';
 
+// Segredo para assinar os tokens (em produção deve estar no .env)
+const JWT_SECRET = process.env.JWT_SECRET || 'segredo_super_secreto_muda_isto';
+
 // --- VISUALIZAÇÃO DE FORMULÁRIOS ---
-/**
- * Renderiza a página unificada de Login/Registo.
- */
 export const renderAuthPage = (req, res) => {
-    // Se o utilizador já estiver autenticado, redireciona para o dashboard
-    if (req.session.userId) {
-        return res.redirect('/dashboard');
+    // Verifica se já existe um token válido no cookie
+    const token = req.cookies?.token;
+
+    if (token) {
+        try {
+            jwt.verify(token, JWT_SECRET);
+            return res.redirect('/dashboard');
+        } catch (e) {
+            // Token inválido, continua para mostrar a página de login
+        }
     }
     
     try {
-        // Obtém o modo inicial da URL (default é 'login')
         const initialMode = req.query.mode || 'login';
         res.render('auth.html', {
             title: initialMode === 'login' ? "Login - O Meu Bolso" : "Registo - O Meu Bolso",
@@ -27,9 +31,6 @@ export const renderAuthPage = (req, res) => {
 };
 
 // --- REGISTO ---
-/**
- * Lida com a submissão do formulário de registro.
- */
 export const registerUser = async (req, res) => {
     const { email, password, name } = req.body;
 
@@ -38,6 +39,7 @@ export const registerUser = async (req, res) => {
     }
 
     try {
+        // Nota: Passamos o name para o signUp para ser guardado nos metadados do utilizador
         const { user, session, error } = await signUp(email, password, name);
 
         if (error) {
@@ -45,29 +47,38 @@ export const registerUser = async (req, res) => {
             return res.status(400).send(`Falha no registro: ${error.message}`);
         }
 
-        if (session && user) {
-            // SUCESSO DE REGISTRO E LOGIN IMEDIATO: 
-            // 1. Armazena o ID e o token do Supabase na sessão do Express
-            req.session.userId = user.id;
-            req.session.accessToken = session.access_token;
+        if (user) {
+            // SUCESSO: Gerar Token JWT Próprio
+            // Incluímos o 'name' no payload para estar disponível no Dashboard
+            const token = jwt.sign(
+                { 
+                    id: user.id, 
+                    email: user.email,
+                    name: name // O nome que veio do formulário
+                }, 
+                JWT_SECRET, 
+                { expiresIn: '1d' }
+            );
+
+            // Guardar no Cookie (Essencial para o res.redirect funcionar)
+            res.cookie('token', token, {
+                httpOnly: true, // Impede acesso via JS no browser (segurança)
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000 // 1 dia
+            });
             
-            return res.redirect('/dashboard'); 
+            return res.redirect('/login'); 
         } else {
-            // Se o Supabase exigir confirmação de email (nenhuma sessão criada)
-            // O frontend trata esta mensagem de sucesso
-            return res.status(200).send("Registo efetuado com sucesso! Verifique o seu email para confirmar a conta.");
+            return res.status(200).send("Registo efetuado! Verifique o email.");
         }
 
     } catch (err) {
         console.error('Erro interno durante o registro:', err);
-        return res.status(500).send('Erro interno do servidor durante o registro.');
+        return res.status(500).send('Erro interno do servidor.');
     }
 };
 
 // --- LOGIN ---
-/**
- * Lida com a submissão do formulário de login.
- */
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -76,41 +87,52 @@ export const loginUser = async (req, res) => {
     }
 
     try {
-        const { session, error } = await signIn(email, password);
+        const { data, error } = await signIn(email, password);
 
         if (error) {
-            console.error('Erro de login:', error.message);
             return res.status(401).send(`Falha no login: ${error.message}`);
         }
         
-        // SUCESSO DE LOGIN:
-        // 1. Armazena o ID e o token do Supabase na sessão do Express
-        req.session.userId = session.user.id;
-        req.session.accessToken = session.access_token;
+        // A resposta do Supabase geralmente vem em data.user e data.session
+        const user = data.user;
+        
+        // Tenta obter o nome dos metadados do Supabase ou usa um fallback
+        const userName = user.user_metadata?.name || user.user_metadata?.full_name || "Utilizador";
+
+        // SUCESSO: Gerar Token JWT
+        const token = jwt.sign(
+            { 
+                id: user.id, 
+                email: user.email, 
+                name: userName 
+            }, 
+            JWT_SECRET, 
+            { expiresIn: '1d' }
+        );
+
+        // Define o Cookie com o Token
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
 
         return res.redirect('/dashboard');
 
     } catch (err) {
         console.error('Erro interno durante o login:', err);
-        return res.status(500).send('Erro interno do servidor durante o login.');
+        return res.status(500).send('Erro interno do servidor.');
     }
 };
 
-
 // --- LOGOUT ---
-/**
- * Lida com o término da sessão.
- */
 export const logoutUser = async (req, res) => {
     try {
-        await signOut();
+        await signOut(); // Logout do Supabase
         
-        req.session.destroy(err => {
-            if (err) {
-                console.error('Erro ao destruir sessão do Express:', err);
-            }
-            res.redirect('/');
-        });
+        // Limpa o cookie do JWT
+        res.clearCookie('token');
+        res.redirect('/');
         
     } catch (err) {
         console.error('Erro interno durante o logout:', err);
@@ -118,22 +140,44 @@ export const logoutUser = async (req, res) => {
     }
 }
 
-// --- MIDDLEWARE DE PROTEÇÃO ---
-/**
- * Middleware para garantir que o utilizador está autenticado (tem uma sessão ativa).
- */
+// --- MIDDLEWARE DE PROTEÇÃO (CORRIGIDO) ---
 export const requireAuth = (req, res, next) => {
-    // Verifica se a sessão tem um ID de utilizador válido
-    if (req.session?.userId) {
-        // Adiciona o ID de utilizador ao request para ser facilmente acessível em Controllers
-        req.userId = req.session.userId;
-        return next();
+    // 1. Tenta obter o token dos cookies (Web) ou do Header (API)
+    let token = req.cookies?.token;
+
+    // Se não houver cookie, verifica se veio no Header (Authorization: Bearer ...)
+    if (!token && req.headers.authorization) {
+        const parts = req.headers.authorization.split(' ');
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+        }
     }
-    // Se não estiver autenticado, redireciona para a página de login
-    res.redirect('/login');
+
+    // 2. Se não houver token, rejeita
+    if (!token) {
+        // Se for API, retorna JSON. Se for Web, redireciona.
+        if (req.path.startsWith('/api')) {
+            return res.status(401).json({ error: 'Não autenticado' });
+        }
+        return res.redirect('/login');
+    }
+
+    // 3. Verifica o token
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        // SUCESSO: Define req.user com os dados do token (incluindo o name!)
+        req.user = decoded;
+        req.userId = decoded.id; // Mantém compatibilidade com código antigo
+
+        next();
+    } catch (error) {
+        console.log("Token inválido:", error.message);
+        res.clearCookie('token');
+        return res.redirect('/login');
+    }
 };
 
-// Exportação padrão 
 export default {
     renderAuthPage,
     loginUser,

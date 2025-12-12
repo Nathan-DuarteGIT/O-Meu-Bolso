@@ -26,9 +26,11 @@
   "homepage": "https://github.com/Nathan-DuarteGIT/O-Meu-Bolso#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "express-session": "^1.18.2"
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

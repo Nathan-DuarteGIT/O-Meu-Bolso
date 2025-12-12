@@ -57,9 +57,12 @@
             </div>
 
             <div class="flex items-center space-x-6">
-                <span class="hidden md:block text-navy font-medium">Olá, <span
-                        class="text-gold font-bold">Teste</span></span>
-                <button class="bg-gold text-navy font-semibold px-5 py-2 rounded-lg hover:bg-opacity-90 transition">
+                <!-- Nome carregado via JS -->
+                <span class="hidden md:block text-navy font-medium">Olá, <span id="headerName"
+                        class="text-gold font-bold">...</span></span>
+                
+                <!-- ALTERAÇÃO 1: Adicionado ID ao botão para o script funcionar -->
+                <button id="btn-logout" class="bg-gold text-navy font-semibold px-5 py-2 rounded-lg hover:bg-opacity-90 transition">
                     Sair
                 </button>
             </div>
@@ -72,7 +75,7 @@
         <!-- Welcome -->
         <div class="mb-10">
             <h1 class="text-4xl md:text-5xl font-extrabold">
-                Bem-vindo de volta, <span id="userName" class="text-gold">carregando...</span>!
+                Bem-vindo de volta, <span id="userName" class="text-gold">...</span>!
             </h1>
             <p class="text-light-gray mt-2">Aqui está o resumo das suas finanças hoje:</p>
         </div>
@@ -231,16 +234,48 @@
         </div>
     </footer>
 
+    <!-- ALTERAÇÃO 2: Script robusto para lidar com Auth via Cookies -->
     <script>
-        fetch('/api/user')
-            .then(r => r.json())
-            .then(data => {
-                const el = document.getElementById('userName');
-                if (el) el.textContent = data.name.split(' ')[0];
-            })
-            .catch(() => location.href = '/login');
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Configurar o botão de Logout
+            const logoutBtn = document.getElementById('btn-logout');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    // Redireciona para a rota de logout do servidor que limpa o cookie
+                    window.location.href = '/logout';
+                });
+            }
+
+            // 2. Buscar dados do utilizador
+            // O cookie 'token' é enviado automaticamente pelo navegador aqui
+            fetch('/api/user')
+                .then(response => {
+                    // Se o token for inválido ou tiver expirado, o servidor retorna 401 ou 403
+                    if (!response.ok) {
+                        throw new Error("Sessão inválida ou expirada");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Preencher o nome no título grande
+                    const mainTitleName = document.getElementById('userName');
+                    if (mainTitleName && data.name) {
+                        mainTitleName.textContent = data.name.split(' ')[0];
+                    }
+
+                    // Preencher o nome no header (se houver)
+                    const headerName = document.getElementById('headerName');
+                    if(headerName && data.name) {
+                        headerName.textContent = data.name.split(' ')[0];
+                    }
+                })
+                .catch(err => {
+                    console.warn("Erro de autenticação:", err);
+                    // Se der erro no fetch (ex: 401), redireciona para login
+                    window.location.href = '/login';
+                });
+        });
     </script>
 
 </body>
-
 </html>
