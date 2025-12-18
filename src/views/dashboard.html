@@ -57,11 +57,8 @@
             </div>
 
             <div class="flex items-center space-x-6">
-                <!-- Nome carregado via JS -->
                 <span class="hidden md:block text-navy font-medium">Olá, <span id="headerName"
                         class="text-gold font-bold">...</span></span>
-
-                <!-- ALTERAÇÃO 1: Adicionado ID ao botão para o script funcionar -->
                 <button id="btn-logout"
                     class="bg-gold text-navy font-semibold px-5 py-2 rounded-lg hover:bg-opacity-90 transition">
                     Sair
@@ -78,98 +75,25 @@
             <h1 class="text-4xl md:text-5xl font-extrabold">
                 Bem-vindo de volta, <span id="userName" class="text-gold">...</span>!
             </h1>
-            <p class="text-light-gray mt-2">Aqui está o resumo das suas finanças hoje:</p>
+            <p class="text-light-gray mt-2">Aqui está o resumo das suas finanças hoje.</p>
         </div>
 
+        <!-- Layout Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- SECÇÃO: Contas & Movimentações Futuras -->
-            <div class="bg-white rounded-2xl shadow-xl p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-navy">Contas & Movimentações Futuras</h2>
-                    <button
-                        class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
-                        + Nova movimentação
-                    </button>
-                </div>
 
-                <div class="space-y-4 max-h-96 overflow-y-auto pr-1">
-                    <!-- Movimentação recorrente (despesa) -->
-                    <div
-                        class="flex items-center justify-between bg-light-gray/10 p-4 rounded-xl hover:bg-light-gray/20 transition">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-11 h-11 bg-purple-100 rounded-full flex items-center justify-center text-xl">
-                                📺</div>
-                            <div>
-                                <p class="font-semibold text-navy">Subscrição Netflix</p>
-                                <p class="text-sm text-gray-600">Recorrente • Todo dia 5</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-red-600">- €9,99</p>
-                            <p class="text-xs text-gray-500">Próxima: 5 Jan 2026</p>
-                        </div>
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- 1. Contas -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-navy">Contas</h2>
+                        <button
+                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                            + Nova movimentação
+                        </button>
                     </div>
 
-                    <!-- Movimentação única (despesa) -->
-                    <div
-                        class="flex items-center justify-between bg-light-gray/10 p-4 rounded-xl hover:bg-light-gray/20 transition">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-11 h-11 bg-orange-100 rounded-full flex items-center justify-center text-xl">
-                                ✈️</div>
-                            <div>
-                                <p class="font-semibold text-navy">Bilhetes avião Tailândia</p>
-                                <p class="text-sm text-gray-600">Pagamento único</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-red-600">- €850,00</p>
-                            <p class="text-xs text-gray-500">Dia: 15 Fev 2026</p>
-                        </div>
-                    </div>
-
-                    <!-- Movimentação recorrente (rendimento) -->
-                    <div
-                        class="flex items-center justify-between bg-light-gray/10 p-4 rounded-xl hover:bg-light-gray/20 transition">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-11 h-11 bg-green-100 rounded-full flex items-center justify-center text-xl">💼
-                            </div>
-                            <div>
-                                <p class="font-semibold text-navy">Salário Mensal</p>
-                                <p class="text-sm text-gray-600">Recorrente • Último dia útil</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-green-600">+ €2.850,00</p>
-                            <p class="text-xs text-gray-500">Próxima: 31 Jan 2026</p>
-                        </div>
-                    </div>
-
-                    <!-- Exemplo adicional -->
-                    <div
-                        class="flex items-center justify-between bg-light-gray/10 p-4 rounded-xl hover:bg-light-gray/20 transition">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-11 h-11 bg-blue-100 rounded-full flex items-center justify-center text-xl">🏠
-                            </div>
-                            <div>
-                                <p class="font-semibold text-navy">Renda da casa</p>
-                                <p class="text-sm text-gray-600">Recorrente • Dia 8</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-red-600">- €650,00</p>
-                            <p class="text-xs text-gray-500">Próxima: 8 Jan 2026</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mensagem caso não haja itens (opcional, pode remover) -->
-                <!-- <p class="text-center text-gray-500 text-sm mt-6">Nenhuma movimentação futura registada.</p> -->
-            </div>
-            <!-- 1. Despesas e Rendimentos -->
-            <div class="lg:col-span-2 space-y-6">
-
-                <!-- Card de Transações -->
+                <!-- 2. Despesas & Rendimentos -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Despesas & Rendimentos</h2>
@@ -180,7 +104,7 @@
                     </div>
 
                     <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <!-- Exemplo de transação -->
+                        <!-- Exemplos de transações -->
                         <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
                             <div class="flex items-center space-x-4">
                                 <div
@@ -193,8 +117,6 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-xl font-bold text-red-600">- €87,40</p>
-                                <button class="text-xs text-gray-500 hover:text-navy">Editar</button>
-                                <button class="text-xs text-red-600 hover:text-red-800 ml-3">Apagar</button>
                             </div>
                         </div>
 
@@ -212,39 +134,49 @@
                                 <p class="text-xl font-bold text-green-600">+ €2.850,00</p>
                             </div>
                         </div>
-                        <!-- Mais transações aqui... -->
+                        <!-- Mais transações aqui -->
                     </div>
                 </div>
 
-                <!-- Limites Mensais -->
+                <!-- 3. Limites Mensais -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <h2 class="text-2xl font-bold text-navy mb-6">Limites Mensais (Dezembro 2025)</h2>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-navy">Limites Mensais (Janeiro 2026)</h2>
+                        <button
+                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                            Editar Limites
+                        </button>
+                    </div>
+
                     <div class="space-y-5">
                         <div>
                             <div class="flex justify-between text-navy mb-2">
                                 <span class="font-medium">Alimentação</span>
-                                <span>€380 / €500</span>
+                                <span>Gasto: €380 / Limite máximo: <span class="font-bold text-gold">€500</span></span>
                             </div>
                             <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-gold h-3 rounded-full" style="width: 76%"></div>
+                                <div class="bg-gold h-3 rounded-full transition-all" style="width: 76%"></div>
                             </div>
                         </div>
+
                         <div>
                             <div class="flex justify-between text-navy mb-2">
                                 <span class="font-medium">Transportes</span>
-                                <span>€120 / €150</span>
+                                <span>Gasto: €120 / Limite máximo: <span class="font-bold text-gold">€150</span></span>
                             </div>
                             <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-gold h-3 rounded-full" style="width: 80%"></div>
+                                <div class="bg-gold h-3 rounded-full transition-all" style="width: 80%"></div>
                             </div>
                         </div>
+
                         <div>
                             <div class="flex justify-between text-navy mb-2">
                                 <span class="font-medium">Lazer</span>
-                                <span class="text-red-600 font-bold">€210 / €200</span>
+                                <span class="text-red-600 font-bold">Gasto: €210 / Limite máximo: <span
+                                        class="font-bold text-gold">€200</span></span>
                             </div>
                             <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-red-600 h-3 rounded-full" style="width: 105%"></div>
+                                <div class="bg-red-600 h-3 rounded-full transition-all" style="width: 105%"></div>
                             </div>
                             <p class="text-xs text-red-600 mt-1">Limite ultrapassado!</p>
                         </div>
@@ -252,9 +184,7 @@
                 </div>
             </div>
 
-            <!-- 2. Coluna Lateral Direita -->
-            <div class="space-y-6">
-
+            <div class="space-y-8">
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
@@ -307,8 +237,9 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
+        </div>
     </main>
 
     <!-- Footer -->
@@ -318,44 +249,32 @@
         </div>
     </footer>
 
-    <!-- ALTERAÇÃO 2: Script robusto para lidar com Auth via Cookies -->
+    <!-- Script de Auth -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Configurar o botão de Logout
             const logoutBtn = document.getElementById('btn-logout');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
-                    // Redireciona para a rota de logout do servidor que limpa o cookie
                     window.location.href = '/logout';
                 });
             }
 
-            // 2. Buscar dados do utilizador
-            // O cookie 'token' é enviado automaticamente pelo navegador aqui
             fetch('/api/user')
                 .then(response => {
-                    // Se o token for inválido ou tiver expirado, o servidor retorna 401 ou 403
-                    if (!response.ok) {
-                        throw new Error("Sessão inválida ou expirada");
-                    }
+                    if (!response.ok) throw new Error("Sessão inválida");
                     return response.json();
                 })
                 .then(data => {
-                    // Preencher o nome no título grande
                     const mainTitleName = document.getElementById('userName');
                     if (mainTitleName && data.name) {
                         mainTitleName.textContent = data.name.split(' ')[0];
                     }
-
-                    // Preencher o nome no header (se houver)
                     const headerName = document.getElementById('headerName');
                     if (headerName && data.name) {
                         headerName.textContent = data.name.split(' ')[0];
                     }
                 })
-                .catch(err => {
-                    console.warn("Erro de autenticação:", err);
-                    // Se der erro no fetch (ex: 401), redireciona para login
+                .catch(() => {
                     window.location.href = '/login';
                 });
         });
