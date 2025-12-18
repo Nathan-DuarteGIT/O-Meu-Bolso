@@ -81,24 +81,29 @@
         <!-- Layout Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+            <!-- Coluna Esquerda -->
             <div class="lg:col-span-2 space-y-8">
 
-                <!-- 1. Contas -->
+                <!-- 1. Conta -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-navy">Contas</h2>
-                        <button
-                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                        <h2 class="text-2xl font-bold text-navy">Conta</h2>
+                        <button class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             + Nova movimentação
                         </button>
                     </div>
+
+                    <!-- Por enquanto vazio -->
+                    <div class="text-center py-12">
+                        <p class="text-gray-500">Nenhuma movimentação registada ainda.</p>
+                    </div>
+                </div>
 
                 <!-- 2. Despesas & Rendimentos -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Despesas & Rendimentos</h2>
-                        <button
-                            class="bg-gold text-navy px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
+                        <button class="bg-gold text-navy px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
                             + Nova transação
                         </button>
                     </div>
@@ -107,9 +112,7 @@
                         <!-- Exemplos de transações -->
                         <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
                             <div class="flex items-center space-x-4">
-                                <div
-                                    class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">
-                                    🛒</div>
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">🛒</div>
                                 <div>
                                     <p class="font-semibold text-navy">Supermercado Continente</p>
                                     <p class="text-sm text-gray-500">12 Dez 2025 • Alimentação</p>
@@ -122,9 +125,7 @@
 
                         <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
                             <div class="flex items-center space-x-4">
-                                <div
-                                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">
-                                    💰</div>
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">💰</div>
                                 <div>
                                     <p class="font-semibold text-navy">Salário Dezembro</p>
                                     <p class="text-sm text-gray-500">10 Dez 2025 • Salário</p>
@@ -134,16 +135,14 @@
                                 <p class="text-xl font-bold text-green-600">+ €2.850,00</p>
                             </div>
                         </div>
-                        <!-- Mais transações aqui -->
                     </div>
                 </div>
 
                 <!-- 3. Limites Mensais -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-navy">Limites Mensais (Janeiro 2026)</h2>
-                        <button
-                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                        <h2 class="text-2xl font-bold text-navy">Limites Mensais (Dezembro 2025)</h2>
+                        <button class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             Editar Limites
                         </button>
                     </div>
@@ -172,8 +171,7 @@
                         <div>
                             <div class="flex justify-between text-navy mb-2">
                                 <span class="font-medium">Lazer</span>
-                                <span class="text-red-600 font-bold">Gasto: €210 / Limite máximo: <span
-                                        class="font-bold text-gold">€200</span></span>
+                                <span class="text-red-600 font-bold">Gasto: €210 / Limite máximo: <span class="font-bold text-gold">€200</span></span>
                             </div>
                             <div class="w-full bg-light-gray rounded-full h-3">
                                 <div class="bg-red-600 h-3 rounded-full transition-all" style="width: 105%"></div>
@@ -184,6 +182,7 @@
                 </div>
             </div>
 
+            <!-- Coluna Direita -->
             <div class="space-y-8">
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
@@ -215,8 +214,7 @@
                             </div>
                         </div>
 
-                        <button
-                            class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        <button class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
                             + Nova Meta
                         </button>
                     </div>
@@ -225,13 +223,11 @@
                 <!-- Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
                     <div class="opacity-60">
-                        <div
-                            class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
                             💱
                         </div>
                         <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
-                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em
-                            tempo real.</p>
+                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em tempo real.</p>
                         <div class="mt-6 p-4 bg-light-gray/20 rounded-xl">
                             <p class="text-3xl font-bold text-navy">1 EUR = ? USD</p>
                         </div>
