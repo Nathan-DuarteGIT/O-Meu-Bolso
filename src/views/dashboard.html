@@ -39,6 +39,18 @@
             background: #FCA311;
             border-radius: 4px;
         }
+
+        /* Animação suave dos modais */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 200ms ease-out;
+        }
     </style>
 </head>
 
@@ -81,19 +93,17 @@
         <!-- Layout Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Coluna Esquerda -->
             <div class="lg:col-span-2 space-y-8">
 
                 <!-- 1. Conta -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Conta</h2>
-                        <button class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                        <button id="openMovementModal"
+                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             + Nova movimentação
                         </button>
                     </div>
-
-                    <!-- Por enquanto vazio -->
                     <div class="text-center py-12">
                         <p class="text-gray-500">Nenhuma movimentação registada ainda.</p>
                     </div>
@@ -103,16 +113,19 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Despesas & Rendimentos</h2>
-                        <button class="bg-gold text-navy px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
+                        <button id="openTransactionModal"
+                            class="bg-gold text-navy px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
                             + Nova transação
                         </button>
                     </div>
 
                     <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <!-- Exemplos de transações -->
+                        <!-- Transações existentes aqui -->
                         <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">🛒</div>
+                                <div
+                                    class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">
+                                    🛒</div>
                                 <div>
                                     <p class="font-semibold text-navy">Supermercado Continente</p>
                                     <p class="text-sm text-gray-500">12 Dez 2025 • Alimentação</p>
@@ -122,19 +135,6 @@
                                 <p class="text-xl font-bold text-red-600">- €87,40</p>
                             </div>
                         </div>
-
-                        <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">💰</div>
-                                <div>
-                                    <p class="font-semibold text-navy">Salário Dezembro</p>
-                                    <p class="text-sm text-gray-500">10 Dez 2025 • Salário</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xl font-bold text-green-600">+ €2.850,00</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -142,7 +142,8 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Limites Mensais (Dezembro 2025)</h2>
-                        <button class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
+                        <button id="openLimitsModal"
+                            class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             Editar Limites
                         </button>
                     </div>
@@ -154,89 +155,225 @@
                                 <span>Gasto: €380 / Limite máximo: <span class="font-bold text-gold">€500</span></span>
                             </div>
                             <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-gold h-3 rounded-full transition-all" style="width: 76%"></div>
+                                <div class="bg-gold h-3 rounded-full" style="width: 76%"></div>
                             </div>
                         </div>
-
-                        <div>
-                            <div class="flex justify-between text-navy mb-2">
-                                <span class="font-medium">Transportes</span>
-                                <span>Gasto: €120 / Limite máximo: <span class="font-bold text-gold">€150</span></span>
-                            </div>
-                            <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-gold h-3 rounded-full transition-all" style="width: 80%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-navy mb-2">
-                                <span class="font-medium">Lazer</span>
-                                <span class="text-red-600 font-bold">Gasto: €210 / Limite máximo: <span class="font-bold text-gold">€200</span></span>
-                            </div>
-                            <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-red-600 h-3 rounded-full transition-all" style="width: 105%"></div>
-                            </div>
-                            <p class="text-xs text-red-600 mt-1">Limite ultrapassado!</p>
-                        </div>
+                        <!-- Outros limites... -->
                     </div>
                 </div>
             </div>
 
-            <!-- Coluna Direita -->
             <div class="space-y-8">
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
-                    <div class="space-y-5">
-                        <div class="border-l-4 border-gold pl-4">
-                            <div class="flex justify-between">
-                                <div>
-                                    <p class="font-semibold text-navy">Fundo de Emergência</p>
-                                    <p class="text-sm text-gray-500">Até Jun 2026</p>
-                                </div>
-                                <span class="text-gold font-bold">€4.200 / €10.000</span>
-                            </div>
-                            <div class="w-full bg-light-gray rounded-full h-3 mt-3">
-                                <div class="bg-gold h-3 rounded-full" style="width: 42%"></div>
-                            </div>
-                        </div>
-
-                        <div class="border-l-4 border-green-500 pl-4">
-                            <div class="flex justify-between">
-                                <div>
-                                    <p class="font-semibold text-navy">Viagem à Tailândia</p>
-                                    <p class="text-sm text-gray-500">Até Dez 2026</p>
-                                </div>
-                                <span class="text-green-600 font-bold">€1.850 / €3.000</span>
-                            </div>
-                            <div class="w-full bg-light-gray rounded-full h-3 mt-3">
-                                <div class="bg-green-500 h-3 rounded-full" style="width: 62%"></div>
-                            </div>
-                        </div>
-
-                        <button class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
-                            + Nova Meta
-                        </button>
+                    <div id="goalsList" class="space-y-5">
+                        <!-- Metas carregadas via JS ou estáticas -->
                     </div>
+                    <button id="openGoalModal"
+                        class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        + Nova Meta
+                    </button>
                 </div>
 
                 <!-- Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
                     <div class="opacity-60">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
-                            💱
-                        </div>
+                        <div
+                            class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
+                            💱</div>
                         <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
-                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em tempo real.</p>
-                        <div class="mt-6 p-4 bg-light-gray/20 rounded-xl">
-                            <p class="text-3xl font-bold text-navy">1 EUR = ? USD</p>
-                        </div>
+                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em
+                            tempo real.</p>
                     </div>
                 </div>
             </div>
 
         </div>
     </main>
+
+    <!-- ==================== MODAIS ==================== -->
+
+    <!-- Modal: Nova Movimentação (Conta) -->
+    <div id="movementModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Nova Movimentação</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('movementModal')">×</button>
+            </div>
+            <form>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Descrição</label>
+                        <input type="text" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor (€)</label>
+                        <input type="number" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Tipo</label>
+                        <select
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                            <option>Despesa</option>
+                            <option>Rendimento</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data prevista</label>
+                        <input type="date" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="recurring" class="h-4 w-4 text-gold border-light-gray rounded">
+                        <label for="recurring" class="ml-2 text-navy">Movimentação recorrente</label>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('movementModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Transação -->
+    <div id="transactionModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Nova Transação</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl"
+                    onclick="closeModal('transactionModal')">×</button>
+            </div>
+            <form>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Descrição</label>
+                        <input type="text" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor (€)</label>
+                        <input type="number" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Categoria</label>
+                        <select
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                            <option>Alimentação</option>
+                            <option>Transportes</option>
+                            <option>Lazer</option>
+                            <option>Salário</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data</label>
+                        <input type="date" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Tipo</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center"><input type="radio" name="type" value="expense" checked
+                                    class="mr-2"><span class="text-red-600">Despesa</span></label>
+                            <label class="flex items-center"><input type="radio" name="type" value="income"
+                                    class="mr-2"><span class="text-green-600">Rendimento</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('transactionModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Registar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Limites Mensais -->
+    <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 modal-enter-active">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Editar Limites Mensais</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('limitsModal')">×</button>
+            </div>
+            <form>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Alimentação (€)</label>
+                        <input type="number" value="500" min="0" step="10"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Transportes (€)</label>
+                        <input type="number" value="150" min="0" step="10"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Lazer (€)</label>
+                        <input type="number" value="200" min="0" step="10"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <!-- Adiciona mais categorias se necessário -->
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('limitsModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Guardar
+                        Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Meta -->
+    <div id="goalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Nova Meta Financeira</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('goalModal')">×</button>
+            </div>
+            <form>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
+                        <input type="text" required placeholder="ex: Fundo de Emergência"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
+                        <input type="number" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
+                        <input type="number" step="0.01" value="0"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data limite</label>
+                        <input type="date" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('goalModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Criar
+                        Meta</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-black py-8 mt-20">
@@ -245,8 +382,35 @@
         </div>
     </footer>
 
-    <!-- Script de Auth -->
+    <!-- Script para Modais + Auth -->
     <script>
+        // Função genérica para abrir/fechar modais
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Abrir modais pelos botões
+        document.getElementById('openMovementModal')?.addEventListener('click', () => openModal('movementModal'));
+        document.getElementById('openTransactionModal')?.addEventListener('click', () => openModal('transactionModal'));
+        document.getElementById('openLimitsModal')?.addEventListener('click', () => openModal('limitsModal'));
+        document.getElementById('openGoalModal')?.addEventListener('click', () => openModal('goalModal'));
+
+        // Fechar ao clicar fora do conteúdo
+        document.querySelectorAll('[id$="Modal"]').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal(modal.id);
+            });
+        });
+
+        // Auth script (mantido)
         document.addEventListener('DOMContentLoaded', () => {
             const logoutBtn = document.getElementById('btn-logout');
             if (logoutBtn) {
@@ -262,13 +426,9 @@
                 })
                 .then(data => {
                     const mainTitleName = document.getElementById('userName');
-                    if (mainTitleName && data.name) {
-                        mainTitleName.textContent = data.name.split(' ')[0];
-                    }
+                    if (mainTitleName && data.name) mainTitleName.textContent = data.name.split(' ')[0];
                     const headerName = document.getElementById('headerName');
-                    if (headerName && data.name) {
-                        headerName.textContent = data.name.split(' ')[0];
-                    }
+                    if (headerName && data.name) headerName.textContent = data.name.split(' ')[0];
                 })
                 .catch(() => {
                     window.location.href = '/login';
