@@ -297,38 +297,93 @@
         </div>
     </div>
 
-    <!-- Modal: Editar Limites Mensais -->
+    <!-- Modal: Limites Mensais -->
     <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 modal-enter-active">
+        <div
+            class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh] modal-enter-active">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-navy">Editar Limites Mensais</h3>
                 <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('limitsModal')">×</button>
             </div>
-            <form>
-                <div class="space-y-6">
+
+            <form id="limitsForm">
+                <!-- Seleção de Mês e Ano -->
+                <div class="grid grid-cols-2 gap-4 mb-8">
                     <div>
-                        <label class="block text-navy font-medium mb-2">Alimentação (€)</label>
-                        <input type="number" value="500" min="0" step="10"
+                        <label class="block text-navy font-medium mb-2">Mês</label>
+                        <select id="limitMonth"
                             class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                            <option value="1">Janeiro</option>
+                            <option value="2">Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12" selected>Dezembro</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-navy font-medium mb-2">Transportes (€)</label>
-                        <input type="number" value="150" min="0" step="10"
+                        <label class="block text-navy font-medium mb-2">Ano</label>
+                        <input type="number" id="limitYear" value="2025" min="2020" max="2040"
                             class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
                     </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Lazer (€)</label>
-                        <input type="number" value="200" min="0" step="10"
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <!-- Adiciona mais categorias se necessário -->
                 </div>
-                <div class="flex gap-4 mt-8">
+
+                <!-- Lista de Categorias (dinâmica) -->
+                <div id="categoriesList" class="space-y-6 mb-6">
+                    <!-- Categoria inicial 1 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Alimentação" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
+                            placeholder="Nome da categoria">
+                        <input type="number" value="500" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
+                            placeholder="Limite (€)">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                    </div>
+
+                    <!-- Categoria inicial 2 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Transportes" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <input type="number" value="150" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                    </div>
+
+                    <!-- Categoria inicial 3 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Lazer" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <input type="number" value="200" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                    </div>
+                </div>
+
+                <!-- Botão Adicionar Categoria -->
+                <button type="button" id="addCategoryBtn"
+                    class="w-full py-3 border-2 border-dashed border-gold text-gold font-semibold rounded-lg hover:bg-gold hover:text-navy transition mb-6">
+                    + Adicionar nova categoria
+                </button>
+
+                <div class="flex gap-4">
                     <button type="button" onclick="closeModal('limitsModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
                     <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Guardar
-                        Alterações</button>
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar Limites
+                    </button>
                 </div>
             </form>
         </div>
@@ -410,7 +465,7 @@
             });
         });
 
-        // Auth script (mantido)
+        // Auth script 
         document.addEventListener('DOMContentLoaded', () => {
             const logoutBtn = document.getElementById('btn-logout');
             if (logoutBtn) {
@@ -433,6 +488,36 @@
                 .catch(() => {
                     window.location.href = '/login';
                 });
+        });
+
+        // Adicionar nova categoria
+        document.getElementById('addCategoryBtn')?.addEventListener('click', () => {
+            const list = document.getElementById('categoriesList');
+            const newItem = document.createElement('div');
+            newItem.className = 'category-item flex items-center gap-4';
+            newItem.innerHTML = `
+            <input type="text" required placeholder="Nome da categoria"
+                   class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+            <input type="number" min="0" step="10" required placeholder="Limite (€)"
+                   class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+            <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
+        `;
+            list.appendChild(newItem);
+        });
+
+        // Remover categoria
+        function removeCategory(btn) {
+            if (document.querySelectorAll('.category-item').length > 1) { // mínimo 1 categoria
+                btn.parentElement.remove();
+            }
+        }
+
+        // Opcional: ao submeter (futuro POST)
+        document.getElementById('limitsForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Aqui farás fetch('/api/limits', { method: 'POST', body: ... })
+            alert('Limites guardados! (simulação)');
+            closeModal('limitsModal');
         });
     </script>
 
