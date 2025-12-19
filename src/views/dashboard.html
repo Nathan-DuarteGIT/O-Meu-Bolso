@@ -98,13 +98,15 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-navy">Conta</h2>
-                        <button id="openMovementModal"
+                        <button
                             class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             + Nova movimentação
                         </button>
                     </div>
-                    <div class="text-center py-12">
-                        <p class="text-gray-500">Nenhuma movimentação registada ainda.</p>
+
+                    <!-- Mensagem centralizada quando vazio -->
+                    <div class="text-center py-16">
+                        <p class="text-gray-500 text-lg">Nenhuma movimentação registada ainda.</p>
                     </div>
                 </div>
 
@@ -193,53 +195,6 @@
     </main>
 
     <!-- ==================== MODAIS ==================== -->
-
-    <!-- Modal: Nova Movimentação (Conta) -->
-    <div id="movementModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-navy">Nova Movimentação</h3>
-                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('movementModal')">×</button>
-            </div>
-            <form>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Descrição</label>
-                        <input type="text" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor (€)</label>
-                        <input type="number" step="0.01" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Tipo</label>
-                        <select
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                            <option>Despesa</option>
-                            <option>Rendimento</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Data prevista</label>
-                        <input type="date" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="recurring" class="h-4 w-4 text-gold border-light-gray rounded">
-                        <label for="recurring" class="ml-2 text-navy">Movimentação recorrente</label>
-                    </div>
-                </div>
-                <div class="flex gap-4 mt-8">
-                    <button type="button" onclick="closeModal('movementModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
-                    <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Adicionar</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Modal: Nova Transação -->
     <div id="transactionModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
@@ -498,7 +453,6 @@
         }
 
         // Abrir modais pelos botões
-        document.getElementById('openMovementModal')?.addEventListener('click', () => openModal('movementModal'));
         document.getElementById('openTransactionModal')?.addEventListener('click', () => openModal('transactionModal'));
         document.getElementById('openLimitsModal')?.addEventListener('click', () => openModal('limitsModal'));
         document.getElementById('openGoalModal')?.addEventListener('click', () => openModal('goalModal'));
