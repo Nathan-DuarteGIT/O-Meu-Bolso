@@ -40,7 +40,6 @@
             border-radius: 4px;
         }
 
-        /* Animação suave dos modais */
         .modal-enter {
             opacity: 0;
             transform: scale(0.95);
@@ -79,7 +78,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <!-- Welcome -->
@@ -164,11 +163,12 @@
             </div>
 
             <div class="space-y-8">
+
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
                     <div id="goalsList" class="space-y-5">
-                        <!-- Metas carregadas via JS ou estáticas -->
+                        <!-- Metas serão adicionadas aqui dinamicamente -->
                     </div>
                     <button id="openGoalModal"
                         class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
@@ -430,6 +430,51 @@
         </div>
     </div>
 
+    <!-- Modal: Editar Meta -->
+    <div id="editGoalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Editar Meta</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('editGoalModal')">×</button>
+            </div>
+            <form id="editGoalForm">
+                <input type="hidden" id="editGoalId">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
+                        <input type="text" id="editGoalName" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
+                        <input type="number" id="editGoalTarget" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
+                        <input type="number" id="editGoalCurrent" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data limite</label>
+                        <input type="date" id="editGoalDeadline" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('editGoalModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-black py-8 mt-20">
         <div class="max-w-7xl mx-auto px-4 text-center text-light-gray text-sm">
@@ -463,6 +508,56 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal(modal.id);
             });
+        });
+
+        // Abrir modal de edição com dados da meta
+        function openEditGoalModal(btn) {
+            const goalItem = btn.closest('.goal-item');
+            const name = goalItem.dataset.name;
+            const current = goalItem.dataset.current;
+            const target = goalItem.dataset.target;
+            const deadline = goalItem.dataset.deadline;
+            const id = goalItem.dataset.id;
+
+            document.getElementById('editGoalId').value = id;
+            document.getElementById('editGoalName').value = name;
+            document.getElementById('editGoalCurrent').value = current;
+            document.getElementById('editGoalTarget').value = target;
+            document.getElementById('editGoalDeadline').value = deadline;
+
+            openModal('editGoalModal');
+        }
+
+        // Guardar alterações da edição da meta
+        document.getElementById('editGoalForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editGoalId').value;
+            const name = document.getElementById('editGoalName').value;
+            const current = parseFloat(document.getElementById('editGoalCurrent').value);
+            const target = parseFloat(document.getElementById('editGoalTarget').value);
+            const deadline = document.getElementById('editGoalDeadline').value;
+
+            const goalItem = document.querySelector(`.goal-item[data-id="${id}"]`);
+            if (goalItem) {
+                // Atualiza dados
+                goalItem.dataset.name = name;
+                goalItem.dataset.current = current;
+                goalItem.dataset.target = target;
+                goalItem.dataset.deadline = deadline;
+
+                // Atualiza visual
+                goalItem.querySelector('p.font-semibold').textContent = name;
+                goalItem.querySelector('p.text-sm.text-gray-500').textContent = `Até ${new Date(deadline).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' })}`;
+                goalItem.querySelector('span.font-bold').textContent = `€${current.toFixed(2)} / €${target.toFixed(2)}`;
+
+                const percentage = (current / target) * 100;
+                const bar = goalItem.querySelector('.h-3.rounded-full');
+                bar.style.width = `${Math.min(percentage, 100)}%`;
+                bar.className = percentage >= 100 ? 'bg-green-500 h-3 rounded-full' : 'bg-gold h-3 rounded-full';
+            }
+
+            closeModal('editGoalModal');
+            // Futuro: fetch('/api/goals/' + id, { method: 'PUT', body: JSON.stringify(...) })
         });
 
         // Auth script 
