@@ -121,11 +121,10 @@
                         </button>
                     </div>
 
-                    <div id="limitsList" class="space-y-5">
-                        <!-- Limites carregados dinamicamente com lápis individual -->
+                    <div id="limitsList" class="space-y-6">
+                        <!-- Limites carregados dinamicamente com alertas visuais -->
                     </div>
                 </div>
-
             </div>
 
             <!-- Coluna direita: Metas Ativas e Conversor de Moedas -->
@@ -146,11 +145,13 @@
                 <!-- Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
                     <div class="opacity-60">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
+                        <div
+                            class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
                             💱
                         </div>
                         <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
-                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em tempo real.</p>
+                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em
+                            tempo real.</p>
                     </div>
                 </div>
 
@@ -262,7 +263,7 @@
     <!-- Modal: Limites Mensais -->
     <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
         <div
-            class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh]">
+            class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh] modal-enter-active">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-navy">Editar Limites Mensais</h3>
                 <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('limitsModal')">×</button>
@@ -298,7 +299,41 @@
 
                 <!-- Lista de Categorias (dinâmica) -->
                 <div id="categoriesList" class="space-y-6 mb-6">
-                    <!-- As categorias serão preenchidas pelo script ao abrir o modal -->
+                    <!-- Categoria inicial 1 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Alimentação" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
+                            placeholder="Nome da categoria">
+                        <input type="number" value="500" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
+                            placeholder="Limite (€)">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                        <button type="button" id="addCategoryBtn"
+                            class="w-full py-3 border-2 border-dashed border-gold text-gold font-semibold rounded-lg hover:bg-gold hover:text-navy transition mb-6 mt-4">
+                            + Adicionar nova categoria
+                        </button>
+                    </div>
+
+                    <!-- Categoria inicial 2 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Transportes" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <input type="number" value="150" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                    </div>
+
+                    <!-- Categoria inicial 3 -->
+                    <div class="category-item flex items-center gap-4">
+                        <input type="text" value="Lazer" required
+                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <input type="number" value="200" min="0" step="10" required
+                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
+                            onclick="removeCategory(this)">×</button>
+                    </div>
                 </div>
 
                 <!-- Botão Adicionar Categoria -->
@@ -354,7 +389,7 @@
 
     <!-- Modal: Nova Meta -->
     <div id="goalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-navy">Nova Meta Financeira</h3>
                 <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('goalModal')">×</button>
@@ -395,7 +430,7 @@
 
     <!-- Modal: Editar Meta -->
     <div id="editGoalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-navy">Editar Meta</h3>
                 <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('editGoalModal')">×</button>
@@ -645,7 +680,6 @@
             closeModal('transactionModal');
         });
 
-        // LIMITES MENSAIS
         function loadBudgets() {
             const list = document.getElementById('limitsList');
             list.innerHTML = '';
@@ -653,47 +687,77 @@
             let monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
 
             if (monthBudgets.length === 0) {
-                // Valores padrão
-                const defaultBudgets = [
-                    { name: "Alimentação", limit: 500, current: 380 },
-                    { name: "Transportes", limit: 150, current: 80 },
-                    { name: "Lazer", limit: 200, current: 120 }
-                ];
-
-                defaultBudgets.forEach(b => {
-                    budgets.push({
-                        id: generateId(),
-                        name: b.name,
-                        limit: b.limit,
-                        current: b.current,
-                        month: currentLimitsMonth
-                    });
-                });
-                saveBudgets();
-                monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
+                list.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhum limite mensal definido para este período.</p>';
+                return;
             }
 
             monthBudgets.forEach(budget => {
-                const percentage = budget.limit > 0 ? (budget.current || 0) / budget.limit * 100 : 0;
+                const spent = budget.current || 0;
+                const limit = budget.limit || 0;
+                const percentage = limit > 0 ? (spent / limit) * 100 : 0;
+                const isOver = spent > limit;
+                const isWarning = percentage >= 70 && percentage < 95;
+                const isDanger = percentage >= 95;
+
+                // Cor da barra
+                let barColor = 'bg-green-500';
+                if (isDanger || isOver) barColor = 'bg-red-600';
+                else if (isWarning) barColor = 'bg-yellow-500';
+
+                // Cor do texto do limite
+                const limitTextClass = isOver ? 'text-red-600 font-bold' : 'text-gold font-bold';
+
+                // Mensagem de alerta
+                const alertMessage = isOver ? '<span class="text-red-600 font-bold text-lg ml-3">⚠️ Limite ultrapassado!</span>' :
+                    (isDanger ? '<span class="text-red-600 font-bold ml-3">⚠️ Quase esgotado!</span>' : '');
+
+                // Borda lateral de alerta
+                const borderColor = isOver ? 'border-red-600' : (isDanger ? 'border-yellow-500' : 'border-green-500');
+
                 const div = document.createElement('div');
-                div.className = 'flex items-center justify-between';
+                div.className = `bg-light-gray/20 p-6 rounded-2xl shadow-md border-l-8 ${borderColor}`;
+
                 div.innerHTML = `
-                    <div class="flex-1">
-                        <div class="flex justify-between text-navy mb-2">
-                            <span class="font-medium">${budget.name}</span>
-                            <span>Gasto: €${(budget.current || 0).toFixed(2)} / Limite: <span class="font-bold text-gold">€${budget.limit.toFixed(2)}</span></span>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-xl font-bold text-navy">${budget.name}</h4>
+                            <div class="flex items-center mt-2 text-lg">
+                                <span>Gasto: <strong>€${spent.toFixed(2)}</strong></span>
+                                <span class="mx-3 text-gray-600">/</span>
+                                <span>Limite: <span class="${limitTextClass}">€${limit.toFixed(2)}</span></span>
+                                ${alertMessage}
+                            </div>
                         </div>
-                        <div class="w-full bg-light-gray rounded-full h-3">
-                            <div class="bg-gold h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                        <div class="flex gap-4">
+                            <button onclick="openEditSingleBudget('${budget.id}')"
+                                class="text-gold text-2xl hover:scale-110 transition">✏️</button>
+                            <button onclick="deleteSingleBudget('${budget.id}')"
+                                class="text-red-600 text-3xl hover:scale-110 transition">✖</button>
                         </div>
                     </div>
-                    <button onclick="openEditSingleBudget('${budget.id}')"
-                        class="ml-6 text-gold text-2xl hover:text-opacity-80">✏️</button>
+
+                    <!-- Barra de progresso com percentagem dentro -->
+                    <div class="w-full bg-gray-300 rounded-full h-6 overflow-hidden shadow-inner">
+                        <div class="${barColor} h-6 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-4 text-white font-bold text-sm"
+                             style="width: ${Math.min(percentage, 100)}%">
+                            ${percentage.toFixed(0)}%
+                        </div>
+                    </div>
                 `;
+
                 list.appendChild(div);
             });
         }
+        // Nova função: excluir limite individual
+        function deleteSingleBudget(id) {
+            if (confirm('Tens a certeza que queres remover este limite mensal?')) {
+                budgets = budgets.filter(b => b.id !== id);
+                saveBudgets();
+                loadBudgets();
+            }
+        }
 
+        // Edição individual 
         function openEditSingleBudget(id) {
             const budget = budgets.find(b => b.id === id);
             if (budget) {
@@ -704,21 +768,34 @@
             }
         }
 
-        document.getElementById('editSingleBudgetForm')?.addEventListener('submit', e => {
+        document.getElementById('editSingleBudgetForm').addEventListener('submit', e => {
             e.preventDefault();
             const id = document.getElementById('editSingleBudgetId').value;
             const budget = budgets.find(b => b.id === id);
             if (budget) {
-                budget.name = document.getElementById('editSingleBudgetName').value.trim();
-                budget.limit = parseFloat(document.getElementById('editSingleBudgetLimit').value);
+                const newName = document.getElementById('editSingleBudgetName').value.trim();
+                const newLimit = parseFloat(document.getElementById('editSingleBudgetLimit').value);
+
+                if (!newName || isNaN(newLimit) || newLimit < 0) {
+                    alert('Preenche os campos corretamente.');
+                    return;
+                }
+
+                budget.name = newName;
+                budget.limit = newLimit;
                 saveBudgets();
                 loadBudgets();
             }
             closeModal('editSingleBudgetModal');
         });
 
-        // Preencher o modal completo com os limites atuais ao abrir
+        // Ao abrir o modal de edição geral de limites
         document.getElementById('openLimitsModal').addEventListener('click', () => {
+            // Preenche mês e ano atuais
+            const [year, month] = currentLimitsMonth.split('-');
+            document.getElementById('limitMonth').value = parseInt(month);
+            document.getElementById('limitYear').value = year;
+
             const monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
             const list = document.getElementById('categoriesList');
             list.innerHTML = '';
@@ -727,75 +804,93 @@
                 const item = document.createElement('div');
                 item.className = 'category-item flex items-center gap-4';
                 item.innerHTML = `
-                    <input type="text" value="${b.name}" required class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    <input type="number" value="${b.limit}" min="0" step="10" required class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
-                `;
+                <input type="text" value="${b.name}" required class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                <input type="number" value="${b.limit}" min="0" step="0.01" required class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                <button type="button" class="text-red-600 hover:text-red-800 text-xl font-bold" onclick="removeCategory(this)">✖</button>
+            `;
                 list.appendChild(item);
             });
 
-            // Se não houver nenhum, adiciona um vazio
+            // Se não houver nenhum, adiciona um campo vazio para começar
             if (monthBudgets.length === 0) {
-                const item = document.createElement('div');
-                item.className = 'category-item flex items-center gap-4';
-                item.innerHTML = `
-                    <input type="text" required placeholder="Nome da categoria" class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    <input type="number" min="0" step="10" required placeholder="Limite (€)" class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
-                `;
-                list.appendChild(item);
+                addEmptyCategoryField();
             }
 
             openModal('limitsModal');
         });
 
-        document.getElementById('addCategoryBtn')?.addEventListener('click', () => {
+        function addEmptyCategoryField() {
             const list = document.getElementById('categoriesList');
             const newItem = document.createElement('div');
             newItem.className = 'category-item flex items-center gap-4';
             newItem.innerHTML = `
-                <input type="text" required placeholder="Nome da categoria"
-                    class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                <input type="number" min="0" step="10" required placeholder="Limite (€)"
-                    class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
-            `;
+            <input type="text" required placeholder="Nome da categoria"
+                class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+            <input type="number" min="0" step="0.01" required placeholder="Limite (€)"
+                class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+            <button type="button" class="text-red-600 hover:text-red-800 text-xl font-bold" onclick="removeCategory(this)">✖</button>
+        `;
             list.appendChild(newItem);
+        }
+
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+            addEmptyCategoryField();
         });
 
         function removeCategory(btn) {
             btn.parentElement.remove();
         }
 
-        document.getElementById('limitsForm')?.addEventListener('submit', e => {
+        // Guardar limites (com mudança de mês se necessário)
+        document.getElementById('limitsForm').addEventListener('submit', e => {
             e.preventDefault();
-            const month = document.getElementById('limitMonth').value;
+
+            const month = document.getElementById('limitMonth').value.padStart(2, '0');
             const year = document.getElementById('limitYear').value;
-            currentLimitsMonth = `${year}-${month.padStart(2, '0')}`;
-            saveCurrentMonth();
+            const newMonthKey = `${year}-${month}`;
 
-            // Remove antigos do mês
-            budgets = budgets.filter(b => b.month !== currentLimitsMonth);
+            // Se mudou o mês, atualiza o currentLimitsMonth
+            if (newMonthKey !== currentLimitsMonth) {
+                currentLimitsMonth = newMonthKey;
+                saveCurrentMonth(); // atualiza o título no card
+            }
 
-            // Adiciona os novos
+            // Remove orçamentos antigos desse mês
+            budgets = budgets.filter(b => b.month !== newMonthKey);
+
+            // Adiciona os novos/editados
+            let hasValid = false;
             document.querySelectorAll('#categoriesList .category-item').forEach(item => {
-                const name = item.querySelector('input[type="text"]').value.trim();
-                const limit = parseFloat(item.querySelector('input[type="number"]').value);
-                if (name && !isNaN(limit)) {
+                const nameInput = item.querySelector('input[type="text"]');
+                const limitInput = item.querySelector('input[type="number"]');
+
+                const name = nameInput.value.trim();
+                const limit = parseFloat(limitInput.value);
+
+                if (name && !isNaN(limit) && limit >= 0) {
                     budgets.push({
                         id: generateId(),
                         name,
                         limit,
-                        current: 0,
-                        month: currentLimitsMonth
+                        current: 0, // gasto atual começa a zero
+                        month: newMonthKey
                     });
+                    hasValid = true;
                 }
             });
+
+            if (!hasValid) {
+                alert('Adiciona pelo menos uma categoria válida.');
+                return;
+            }
 
             saveBudgets();
             loadBudgets();
             closeModal('limitsModal');
         });
+
+        // Atualiza o título com o mês/ano atual ao carregar
+        saveCurrentMonth();
 
         // METAS
         function loadGoals() {
@@ -807,19 +902,19 @@
                 const div = document.createElement('div');
                 div.className = 'bg-light-gray/20 p-4 rounded-xl';
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="font-semibold text-navy">${goal.name}</p>
-                            <p class="text-sm text-gray-500">Até ${new Date(goal.deadline).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' })}</p>
-                        </div>
-                        <button onclick="openEditGoalModal('${goal.id}')"
-                            class="text-gold text-2xl hover:text-opacity-80">✏️</button>
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-semibold text-navy">${goal.name}</p>
+                        <p class="text-sm text-gray-500">Até ${new Date(goal.deadline).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' })}</p>
                     </div>
-                    <p class="text-sm font-bold text-navy mb-2">€${goal.current.toFixed(2)} / €${goal.target.toFixed(2)}</p>
-                    <div class="w-full bg-light-gray rounded-full h-3">
-                        <div class="${percentage >= 100 ? 'bg-green-500' : 'bg-gold'} h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
-                    </div>
-                `;
+                    <button onclick="openEditGoalModal('${goal.id}')"
+                        class="text-gold text-2xl hover:text-opacity-80">✏️</button>
+                </div>
+                <p class="text-sm font-bold text-navy mb-2">€${goal.current.toFixed(2)} / €${goal.target.toFixed(2)}</p>
+                <div class="w-full bg-light-gray rounded-full h-3">
+                    <div class="${percentage >= 100 ? 'bg-green-500' : 'bg-gold'} h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                </div>
+            `;
                 list.appendChild(div);
             });
         }
