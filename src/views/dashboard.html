@@ -841,7 +841,6 @@
             btn.parentElement.remove();
         }
 
-        // Guardar limites (com mudança de mês se necessário)
         document.getElementById('limitsForm').addEventListener('submit', e => {
             e.preventDefault();
 
@@ -849,41 +848,61 @@
             const year = document.getElementById('limitYear').value;
             const newMonthKey = `${year}-${month}`;
 
-            // Se mudou o mês, atualiza o currentLimitsMonth
+            // Atualiza o mês atual se mudou
             if (newMonthKey !== currentLimitsMonth) {
                 currentLimitsMonth = newMonthKey;
-                saveCurrentMonth(); // atualiza o título no card
+                saveCurrentMonth(); // Atualiza o título no card
             }
 
-            // Remove orçamentos antigos desse mês
+            // Remove todos os limites antigos desse mês
             budgets = budgets.filter(b => b.month !== newMonthKey);
 
-            // Adiciona os novos/editados
-            let hasValid = false;
+            let hasValidCategory = false;
+
+            // Percorre todas as linhas de categoria
             document.querySelectorAll('#categoriesList .category-item').forEach(item => {
                 const nameInput = item.querySelector('input[type="text"]');
                 const limitInput = item.querySelector('input[type="number"]');
 
                 const name = nameInput.value.trim();
-                const limit = parseFloat(limitInput.value);
+                const limitValue = limitInput.value.trim();
 
-                if (name && !isNaN(limit) && limit >= 0) {
-                    budgets.push({
-                        id: generateId(),
-                        name,
-                        limit,
-                        current: 0, // gasto atual começa a zero
-                        month: newMonthKey
-                    });
-                    hasValid = true;
+                // Nome da categoria é obrigatório
+                if (name === '') {
+                    alert('Todas as categorias devem ter um nome.');
+                    hasValidCategory = false;
+                    return;
                 }
+
+                // Valor do limite: vazio → 0, senão converte para número
+                let limit = 0;
+                if (limitValue !== '') {
+                    limit = parseFloat(limitValue);
+                    if (isNaN(limit) || limit < 0) {
+                        alert(`Valor inválido para a categoria "${name}". Use um número positivo ou deixe vazio.`);
+                        hasValidCategory = false;
+                        return;
+                    }
+                }
+
+                // Salva a categoria (mesmo com limite 0)
+                budgets.push({
+                    id: generateId(),
+                    name: name,
+                    limit: limit,        // Pode ser 0
+                    current: 0,
+                    month: newMonthKey
+                });
+
+                hasValidCategory = true;
             });
 
-            if (!hasValid) {
-                alert('Adiciona pelo menos uma categoria válida.');
+            // Se não houver nenhuma categoria válida, não salva
+            if (!hasValidCategory) {
                 return;
             }
 
+            // Salva no localStorage e atualiza o card
             saveBudgets();
             loadBudgets();
             closeModal('limitsModal');
