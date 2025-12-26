@@ -81,6 +81,7 @@
         <!-- Layout Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+            <!-- Coluna esquerda: Contas, Despesas & Rendimentos e Limites Mensais -->
             <div class="lg:col-span-2 space-y-8">
 
                 <!-- 1. Contas -->
@@ -112,42 +113,47 @@
                 <!-- 3. Limites Mensais -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-navy">Limites Mensais (Dezembro 2025)</h2>
+                        <h2 class="text-2xl font-bold text-navy">Limites Mensais <span id="limitsMonthYear"
+                                class="text-gold">(Dezembro 2025)</span></h2>
                         <button id="openLimitsModal"
                             class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             Editar Limites
                         </button>
                     </div>
 
-                    <div class="space-y-5">
-                        <div>
-                            <div class="flex justify-between text-navy mb-2">
-                                <span class="font-medium">Alimentação</span>
-                                <span>Gasto: €380 / Limite máximo: <span class="font-bold text-gold">€500</span></span>
-                            </div>
-                            <div class="w-full bg-light-gray rounded-full h-3">
-                                <div class="bg-gold h-3 rounded-full" style="width: 76%"></div>
-                            </div>
-                        </div>
+                    <div id="limitsList" class="space-y-5">
+                        <!-- Limites carregados dinamicamente com lápis individual -->
                     </div>
                 </div>
+
             </div>
 
+            <!-- Coluna direita: Metas Ativas e Conversor de Moedas -->
             <div class="space-y-8">
+
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
-                    <div id="goalsList" class="space-y-5"></div>
+                    <div id="goalsList" class="space-y-5">
+                        <!-- Metas carregadas dinamicamente -->
+                    </div>
                     <button id="openGoalModal"
                         class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
                         + Nova Meta
                     </button>
                 </div>
 
-                <!-- Placeholder Conversor -->
+                <!-- Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-                    <p class="text-navy text-lg font-medium">Conversor de Moedas (em breve)</p>
+                    <div class="opacity-60">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
+                            💱
+                        </div>
+                        <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
+                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em tempo real.</p>
+                    </div>
                 </div>
+
             </div>
         </div>
     </main>
@@ -253,6 +259,185 @@
         </div>
     </div>
 
+    <!-- Modal: Limites Mensais -->
+    <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div
+            class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Editar Limites Mensais</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('limitsModal')">×</button>
+            </div>
+
+            <form id="limitsForm">
+                <!-- Seleção de Mês e Ano -->
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Mês</label>
+                        <select id="limitMonth"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                            <option value="1">Janeiro</option>
+                            <option value="2">Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12" selected>Dezembro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Ano</label>
+                        <input type="number" id="limitYear" value="2025" min="2020" max="2040"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                </div>
+
+                <!-- Lista de Categorias (dinâmica) -->
+                <div id="categoriesList" class="space-y-6 mb-6">
+                    <!-- As categorias serão preenchidas pelo script ao abrir o modal -->
+                </div>
+
+                <!-- Botão Adicionar Categoria -->
+                <button type="button" id="addCategoryBtn"
+                    class="w-full py-3 border-2 border-dashed border-gold text-gold font-semibold rounded-lg hover:bg-gold hover:text-navy transition mb-6">
+                    + Adicionar nova categoria
+                </button>
+
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('limitsModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar Limites
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Limite Individual -->
+    <div id="editSingleBudgetModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
+            <h3 class="text-2xl font-bold mb-6">Editar Limite</h3>
+            <form id="editSingleBudgetForm">
+                <input type="hidden" id="editSingleBudgetId">
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Categoria</label>
+                    <input type="text" id="editSingleBudgetName" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Limite mensal (€)</label>
+                    <input type="number" id="editSingleBudgetLimit" step="0.01" min="0" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('editSingleBudgetModal')"
+                        class="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Meta -->
+    <div id="goalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Nova Meta Financeira</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('goalModal')">×</button>
+            </div>
+            <form>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
+                        <input type="text" required placeholder="ex: Fundo de Emergência"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
+                        <input type="number" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
+                        <input type="number" step="0.01" value="0"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data limite</label>
+                        <input type="date" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('goalModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Criar
+                        Meta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Meta -->
+    <div id="editGoalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-navy">Editar Meta</h3>
+                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('editGoalModal')">×</button>
+            </div>
+            <form id="editGoalForm">
+                <input type="hidden" id="editGoalId">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
+                        <input type="text" id="editGoalName" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
+                        <input type="number" id="editGoalTarget" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
+                        <input type="number" id="editGoalCurrent" step="0.01" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-navy font-medium mb-2">Data limite</label>
+                        <input type="date" id="editGoalDeadline" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeModal('editGoalModal')"
+                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-black py-8 mt-20">
         <div class="max-w-7xl mx-auto px-4 text-center text-light-gray text-sm">
@@ -265,9 +450,20 @@
         // Dados simulados
         let accounts = JSON.parse(localStorage.getItem('simulatedAccounts')) || [];
         let transactions = JSON.parse(localStorage.getItem('simulatedTransactions')) || [];
+        let budgets = JSON.parse(localStorage.getItem('simulatedBudgets')) || [];
+        let goals = JSON.parse(localStorage.getItem('simulatedGoals')) || [];
+        let currentLimitsMonth = localStorage.getItem('currentLimitsMonth') || '2025-12'; // formato YYYY-MM
 
         function saveAccounts() { localStorage.setItem('simulatedAccounts', JSON.stringify(accounts)); }
         function saveTransactions() { localStorage.setItem('simulatedTransactions', JSON.stringify(transactions)); }
+        function saveBudgets() { localStorage.setItem('simulatedBudgets', JSON.stringify(budgets)); }
+        function saveGoals() { localStorage.setItem('simulatedGoals', JSON.stringify(goals)); }
+        function saveCurrentMonth() {
+            localStorage.setItem('currentLimitsMonth', currentLimitsMonth);
+            const date = new Date(currentLimitsMonth + '-01');
+            const formatted = date.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+            document.getElementById('limitsMonthYear').textContent = `(${formatted.charAt(0).toUpperCase() + formatted.slice(1)})`;
+        }
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
         // Modais genéricos
@@ -295,23 +491,23 @@
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
                 div.innerHTML = `
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-2xl">💳</div>
-                <div>
-                    <p class="font-semibold text-navy">${acc.nome}</p>
-                    <p class="text-sm text-gray-500">${acc.tipo.charAt(0).toUpperCase() + acc.tipo.slice(1)}</p>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-2xl">💳</div>
+                    <div>
+                        <p class="font-semibold text-navy">${acc.nome}</p>
+                        <p class="text-sm text-gray-500">${acc.tipo.charAt(0).toUpperCase() + acc.tipo.slice(1)}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="text-right">
-                <p class="text-xl font-bold text-navy">€${parseFloat(acc.saldo_atual).toFixed(2)}</p>
-                <div class="mt-2 space-x-4">
-                    <button onclick="openEditAccountModal('${acc.id}', '${acc.nome.replace(/'/g, "\\'")}', '${acc.tipo}', ${acc.saldo_atual})"
-                        class="text-sm text-gold underline hover:text-opacity-80">Editar</button>
-                    <button onclick="deleteAccount('${acc.id}')"
-                        class="text-sm text-red-600 underline hover:text-red-800">Excluir</button>
+                <div class="text-right">
+                    <p class="text-xl font-bold text-navy">€${parseFloat(acc.saldo_atual).toFixed(2)}</p>
+                    <div class="mt-2 space-x-4">
+                        <button onclick="openEditAccountModal('${acc.id}', '${acc.nome.replace(/'/g, "\\'")}', '${acc.tipo}', ${acc.saldo_atual})"
+                            class="text-sm text-gold underline hover:text-opacity-80">Editar</button>
+                        <button onclick="deleteAccount('${acc.id}')"
+                            class="text-sm text-red-600 underline hover:text-red-800">Excluir</button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
                 list.appendChild(div);
             });
         }
@@ -368,7 +564,6 @@
             });
         }
 
-        // Transações 
         function loadTransactions() {
             const container = document.getElementById('transactionsList');
             container.innerHTML = '';
@@ -385,23 +580,23 @@
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
                 div.innerHTML = `
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 ${trans.type === 'expense' ? 'bg-red-100' : 'bg-green-100'} rounded-full flex items-center justify-center text-2xl">
-                    ${trans.type === 'expense' ? '🛒' : '💰'}
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 ${trans.type === 'expense' ? 'bg-red-100' : 'bg-green-100'} rounded-full flex items-center justify-center text-2xl">
+                        ${trans.type === 'expense' ? '🛒' : '💰'}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-navy">${trans.description}</p>
+                        <p class="text-sm text-gray-500">${new Date(trans.date).toLocaleDateString('pt-PT')} • ${accountName}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold text-navy">${trans.description}</p>
-                    <p class="text-sm text-gray-500">${new Date(trans.date).toLocaleDateString('pt-PT')} • ${accountName}</p>
+                <div class="text-right">
+                    <p class="text-xl font-bold ${trans.type === 'expense' ? 'text-red-600' : 'text-green-600'}">
+                        ${trans.type === 'expense' ? '-' : '+'} €${parseFloat(trans.amount).toFixed(2)}
+                    </p>
+                    <button onclick="deleteTransaction('${trans.id}')"
+                        class="text-sm text-red-600 underline hover:text-red-800 mt-2 block">Excluir</button>
                 </div>
-            </div>
-            <div class="text-right">
-                <p class="text-xl font-bold ${trans.type === 'expense' ? 'text-red-600' : 'text-green-600'}">
-                    ${trans.type === 'expense' ? '-' : '+'} €${parseFloat(trans.amount).toFixed(2)}
-                </p>
-                <button onclick="deleteTransaction('${trans.id}')"
-                    class="text-sm text-red-600 underline hover:text-red-800 mt-2 block">Excluir</button>
-            </div>
-        `;
+            `;
                 container.appendChild(div);
             });
         }
@@ -417,7 +612,7 @@
 
         document.getElementById('openTransactionModal').addEventListener('click', () => {
             loadAccountOptions();
-            document.getElementById('transactionDate').value = '2025-12-26'; // data atual conforme contexto
+            document.getElementById('transactionDate').value = '2025-12-26';
             openModal('transactionModal');
         });
 
@@ -450,10 +645,239 @@
             closeModal('transactionModal');
         });
 
+        // LIMITES MENSAIS
+        function loadBudgets() {
+            const list = document.getElementById('limitsList');
+            list.innerHTML = '';
+
+            let monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
+
+            if (monthBudgets.length === 0) {
+                // Valores padrão
+                const defaultBudgets = [
+                    { name: "Alimentação", limit: 500, current: 380 },
+                    { name: "Transportes", limit: 150, current: 80 },
+                    { name: "Lazer", limit: 200, current: 120 }
+                ];
+
+                defaultBudgets.forEach(b => {
+                    budgets.push({
+                        id: generateId(),
+                        name: b.name,
+                        limit: b.limit,
+                        current: b.current,
+                        month: currentLimitsMonth
+                    });
+                });
+                saveBudgets();
+                monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
+            }
+
+            monthBudgets.forEach(budget => {
+                const percentage = budget.limit > 0 ? (budget.current || 0) / budget.limit * 100 : 0;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between';
+                div.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex justify-between text-navy mb-2">
+                            <span class="font-medium">${budget.name}</span>
+                            <span>Gasto: €${(budget.current || 0).toFixed(2)} / Limite: <span class="font-bold text-gold">€${budget.limit.toFixed(2)}</span></span>
+                        </div>
+                        <div class="w-full bg-light-gray rounded-full h-3">
+                            <div class="bg-gold h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    </div>
+                    <button onclick="openEditSingleBudget('${budget.id}')"
+                        class="ml-6 text-gold text-2xl hover:text-opacity-80">✏️</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openEditSingleBudget(id) {
+            const budget = budgets.find(b => b.id === id);
+            if (budget) {
+                document.getElementById('editSingleBudgetId').value = budget.id;
+                document.getElementById('editSingleBudgetName').value = budget.name;
+                document.getElementById('editSingleBudgetLimit').value = budget.limit.toFixed(2);
+                openModal('editSingleBudgetModal');
+            }
+        }
+
+        document.getElementById('editSingleBudgetForm')?.addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('editSingleBudgetId').value;
+            const budget = budgets.find(b => b.id === id);
+            if (budget) {
+                budget.name = document.getElementById('editSingleBudgetName').value.trim();
+                budget.limit = parseFloat(document.getElementById('editSingleBudgetLimit').value);
+                saveBudgets();
+                loadBudgets();
+            }
+            closeModal('editSingleBudgetModal');
+        });
+
+        // Preencher o modal completo com os limites atuais ao abrir
+        document.getElementById('openLimitsModal').addEventListener('click', () => {
+            const monthBudgets = budgets.filter(b => b.month === currentLimitsMonth);
+            const list = document.getElementById('categoriesList');
+            list.innerHTML = '';
+
+            monthBudgets.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'category-item flex items-center gap-4';
+                item.innerHTML = `
+                    <input type="text" value="${b.name}" required class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    <input type="number" value="${b.limit}" min="0" step="10" required class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
+                `;
+                list.appendChild(item);
+            });
+
+            // Se não houver nenhum, adiciona um vazio
+            if (monthBudgets.length === 0) {
+                const item = document.createElement('div');
+                item.className = 'category-item flex items-center gap-4';
+                item.innerHTML = `
+                    <input type="text" required placeholder="Nome da categoria" class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    <input type="number" min="0" step="10" required placeholder="Limite (€)" class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                    <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
+                `;
+                list.appendChild(item);
+            }
+
+            openModal('limitsModal');
+        });
+
+        document.getElementById('addCategoryBtn')?.addEventListener('click', () => {
+            const list = document.getElementById('categoriesList');
+            const newItem = document.createElement('div');
+            newItem.className = 'category-item flex items-center gap-4';
+            newItem.innerHTML = `
+                <input type="text" required placeholder="Nome da categoria"
+                    class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                <input type="number" min="0" step="10" required placeholder="Limite (€)"
+                    class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
+                <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
+            `;
+            list.appendChild(newItem);
+        });
+
+        function removeCategory(btn) {
+            btn.parentElement.remove();
+        }
+
+        document.getElementById('limitsForm')?.addEventListener('submit', e => {
+            e.preventDefault();
+            const month = document.getElementById('limitMonth').value;
+            const year = document.getElementById('limitYear').value;
+            currentLimitsMonth = `${year}-${month.padStart(2, '0')}`;
+            saveCurrentMonth();
+
+            // Remove antigos do mês
+            budgets = budgets.filter(b => b.month !== currentLimitsMonth);
+
+            // Adiciona os novos
+            document.querySelectorAll('#categoriesList .category-item').forEach(item => {
+                const name = item.querySelector('input[type="text"]').value.trim();
+                const limit = parseFloat(item.querySelector('input[type="number"]').value);
+                if (name && !isNaN(limit)) {
+                    budgets.push({
+                        id: generateId(),
+                        name,
+                        limit,
+                        current: 0,
+                        month: currentLimitsMonth
+                    });
+                }
+            });
+
+            saveBudgets();
+            loadBudgets();
+            closeModal('limitsModal');
+        });
+
+        // METAS
+        function loadGoals() {
+            const list = document.getElementById('goalsList');
+            list.innerHTML = '';
+
+            goals.forEach(goal => {
+                const percentage = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
+                const div = document.createElement('div');
+                div.className = 'bg-light-gray/20 p-4 rounded-xl';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-semibold text-navy">${goal.name}</p>
+                            <p class="text-sm text-gray-500">Até ${new Date(goal.deadline).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' })}</p>
+                        </div>
+                        <button onclick="openEditGoalModal('${goal.id}')"
+                            class="text-gold text-2xl hover:text-opacity-80">✏️</button>
+                    </div>
+                    <p class="text-sm font-bold text-navy mb-2">€${goal.current.toFixed(2)} / €${goal.target.toFixed(2)}</p>
+                    <div class="w-full bg-light-gray rounded-full h-3">
+                        <div class="${percentage >= 100 ? 'bg-green-500' : 'bg-gold'} h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openEditGoalModal(id) {
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                document.getElementById('editGoalId').value = goal.id;
+                document.getElementById('editGoalName').value = goal.name;
+                document.getElementById('editGoalCurrent').value = goal.current.toFixed(2);
+                document.getElementById('editGoalTarget').value = goal.target.toFixed(2);
+                document.getElementById('editGoalDeadline').value = goal.deadline;
+                openModal('editGoalModal');
+            }
+        }
+
+        document.querySelector('#goalModal form')?.addEventListener('submit', e => {
+            e.preventDefault();
+            const name = e.target[0].value.trim();
+            const target = parseFloat(e.target[1].value);
+            const current = parseFloat(e.target[2].value) || 0;
+            const deadline = e.target[3].value;
+
+            goals.push({
+                id: generateId(),
+                name,
+                current,
+                target,
+                deadline
+            });
+            saveGoals();
+            loadGoals();
+            closeModal('goalModal');
+            e.target.reset();
+        });
+
+        document.getElementById('editGoalForm')?.addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('editGoalId').value;
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                goal.name = document.getElementById('editGoalName').value.trim();
+                goal.current = parseFloat(document.getElementById('editGoalCurrent').value);
+                goal.target = parseFloat(document.getElementById('editGoalTarget').value);
+                goal.deadline = document.getElementById('editGoalDeadline').value;
+                saveGoals();
+                loadGoals();
+            }
+            closeModal('editGoalModal');
+        });
+
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             loadAccounts();
             loadTransactions();
+            loadBudgets();
+            loadGoals();
+            saveCurrentMonth();
 
             // Auth placeholder
             fetch('/api/user')
@@ -473,7 +897,6 @@
         function deleteAccount(id) {
             if (confirm('Tens a certeza que queres excluir esta conta? Esta ação não pode ser desfeita.')) {
                 accounts = accounts.filter(a => a.id !== id);
-                // Também remove transações associadas a esta conta
                 transactions = transactions.filter(t => t.account_id !== id);
                 saveAccounts();
                 saveTransactions();
@@ -486,7 +909,6 @@
             if (confirm('Tens a certeza que queres excluir esta transação?')) {
                 const trans = transactions.find(t => t.id === id);
                 if (trans) {
-                    // Reverte o saldo da conta
                     const acc = accounts.find(a => a.id === trans.account_id);
                     if (acc) {
                         if (trans.type === 'expense') {
