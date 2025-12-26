@@ -94,19 +94,24 @@
 
             <div class="lg:col-span-2 space-y-8">
 
-                <!-- 1. Conta -->
-                <div class="bg-white rounded-2xl shadow-xl p-6">
+                <!-- 1. Contas -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 text-navy">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-navy">Conta</h2>
-                        <button
+                        <h2 class="text-2xl font-bold">Contas</h2>
+                        <button id="openAccountModal"
                             class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
-                            + Nova movimentação
+                            + Nova conta
                         </button>
                     </div>
 
-                    <!-- Mensagem centralizada quando vazio -->
-                    <div class="text-center py-16">
-                        <p class="text-gray-500 text-lg">Nenhuma movimentação registada ainda.</p>
+                    <!-- Lista de contas -->
+                    <div id="accountsList" class="space-y-4">
+                        <!-- Contas carregadas dinamicamente -->
+                    </div>
+
+                    <!-- Mensagem quando vazio -->
+                    <div id="noAccountsMessage" class="text-center py-16">
+                        <p class="text-gray-500 text-lg">Nenhuma conta registada ainda.</p>
                     </div>
                 </div>
 
@@ -195,6 +200,52 @@
     </main>
 
     <!-- ==================== MODAIS ==================== -->
+
+    <!-- Modal: Criar/Editar Conta -->
+    <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
+            <h3 id="accountModalTitle" class="text-2xl font-bold mb-6">Nova Conta</h3>
+            <form id="accountForm">
+                <input type="hidden" id="accountId" value="">
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Nome da conta</label>
+                    <input type="text" id="accountName" required placeholder="ex: Millennium BCP"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Tipo de conta</label>
+                    <select id="accountType" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                        <option value="corrente">Conta à ordem</option>
+                        <option value="poupanca">Conta poupança</option>
+                        <option value="conjunta">Conta conjunta</option>
+                        <option value="salario">Conta salário</option>
+                        <option value="universitaria">Conta universitária</option>
+                        <option value="outra">Outra</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Saldo inicial (€)</label>
+                    <input type="number" id="accountBalance" step="0.01" min="0" required placeholder="0.00"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('accountModal')"
+                        class="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal: Nova Transação -->
     <div id="transactionModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
@@ -462,6 +513,95 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal(modal.id);
             });
+        });
+
+        // Abrir modal para nova conta
+        document.getElementById('openAccountModal')?.addEventListener('click', () => {
+            document.getElementById('accountModalTitle').textContent = 'Nova Conta';
+            document.getElementById('accountForm').reset();
+            document.getElementById('accountId').value = '';
+            openModal('accountModal');
+        });
+
+        // Função para abrir edição
+        function openEditAccountModal(id, nome, tipo, saldo_atual) {
+            document.getElementById('accountModalTitle').textContent = 'Editar Conta';
+            document.getElementById('accountId').value = id;
+            document.getElementById('accountName').value = nome;
+            document.getElementById('accountType').value = tipo;
+            document.getElementById('accountBalance').value = saldo_atual;
+            openModal('accountModal');
+        }
+
+        // Carregar contas do utilizador
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/api/accounts'); 
+                if (!response.ok) throw new Error('Erro ao carregar');
+                const accounts = await response.json();
+
+                const list = document.getElementById('accountsList');
+                list.innerHTML = '';
+
+                if (accounts.length === 0) {
+                    document.getElementById('noAccountsMessage').classList.remove('hidden');
+                    return;
+                }
+                document.getElementById('noAccountsMessage').classList.add('hidden');
+
+                accounts.forEach(acc => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
+                    div.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-2xl">💳</div>
+                    <div>
+                        <p class="font-semibold">${acc.nome}</p>
+                        <p class="text-sm text-gray-500">${acc.tipo.charAt(0).toUpperCase() + acc.tipo.slice(1)}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xl font-bold">€${parseFloat(acc.saldo_atual).toFixed(2)}</p>
+                    <button onclick="openEditAccountModal(${acc.id}, '${acc.nome.replace(/'/g, "\\'")}', '${acc.tipo}', ${acc.saldo_atual})"
+                        class="text-sm text-gold underline mt-1">Editar</button>
+                </div>
+            `;
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Erro ao carregar contas:', err);
+            }
+        }
+
+        // Submissão do formulário (criar ou editar)
+        document.getElementById('accountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('accountId').value;
+            const name = document.getElementById('accountName').value;
+            const type = document.getElementById('accountType').value;
+            const balance = parseFloat(document.getElementById('accountBalance').value);
+
+            const url = id ? `/api/accounts/${id}` : '/api/accounts';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, type, balance })
+                });
+                if (!res.ok) throw new Error('Falha ao guardar');
+                closeModal('accountModal');
+                loadAccounts();
+            } catch (err) {
+                alert('Erro: ' + err.message);
+            }
+        });
+
+        // Chamar ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... código existente
+            loadAccounts();
         });
 
         // Abrir modal de edição com dados da meta
