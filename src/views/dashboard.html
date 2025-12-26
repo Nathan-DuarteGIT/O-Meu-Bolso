@@ -39,17 +39,6 @@
             background: #FCA311;
             border-radius: 4px;
         }
-
-        .modal-enter {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        .modal-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: all 200ms ease-out;
-        }
     </style>
 </head>
 
@@ -95,53 +84,29 @@
             <div class="lg:col-span-2 space-y-8">
 
                 <!-- 1. Contas -->
-                <div class="bg-white rounded-2xl shadow-xl p-6 text-navy">
-                    <div class="flex justify-between items-center mb-6">
+                <div class="bg-white rounded-2xl shadow-xl text-navy flex flex-col max-h-96 overflow-hidden">
+                    <div
+                        class="flex justify-between items-center px-6 py-4 bg-white border-b border-light-gray sticky top-0 z-10 shadow-sm">
                         <h2 class="text-2xl font-bold">Contas</h2>
                         <button id="openAccountModal"
                             class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             + Nova conta
                         </button>
                     </div>
-
-                    <!-- Lista de contas -->
-                    <div id="accountsList" class="space-y-4">
-                        <!-- Contas carregadas dinamicamente -->
-                    </div>
-
-                    <!-- Mensagem quando vazio -->
-                    <div id="noAccountsMessage" class="text-center py-16">
-                        <p class="text-gray-500 text-lg">Nenhuma conta registada ainda.</p>
-                    </div>
+                    <div id="accountsList" class="space-y-4 p-6 flex-1 overflow-y-auto"></div>
                 </div>
 
                 <!-- 2. Despesas & Rendimentos -->
-                <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-navy">Despesas & Rendimentos</h2>
+                <div class="bg-white rounded-2xl shadow-xl text-navy flex flex-col max-h-96 overflow-hidden">
+                    <div
+                        class="flex justify-between items-center px-6 py-4 bg-white border-b border-light-gray sticky top-0 z-10 shadow-sm">
+                        <h2 class="text-2xl font-bold">Despesas & Rendimentos</h2>
                         <button id="openTransactionModal"
                             class="bg-gold text-navy px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
                             + Nova transação
                         </button>
                     </div>
-
-                    <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <!-- Transações existentes aqui -->
-                        <div class="flex justify-between items-center bg-light-gray/20 p-4 rounded-xl">
-                            <div class="flex items-center space-x-4">
-                                <div
-                                    class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">
-                                    🛒</div>
-                                <div>
-                                    <p class="font-semibold text-navy">Supermercado Continente</p>
-                                    <p class="text-sm text-gray-500">12 Dez 2025 • Alimentação</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xl font-bold text-red-600">- €87,40</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="transactionsList" class="space-y-4 p-6 flex-1 overflow-y-auto"></div>
                 </div>
 
                 <!-- 3. Limites Mensais -->
@@ -164,44 +129,30 @@
                                 <div class="bg-gold h-3 rounded-full" style="width: 76%"></div>
                             </div>
                         </div>
-                        <!-- Outros limites... -->
                     </div>
                 </div>
             </div>
 
             <div class="space-y-8">
-
                 <!-- Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
-                    <div id="goalsList" class="space-y-5">
-                        <!-- Metas serão adicionadas aqui dinamicamente -->
-                    </div>
+                    <div id="goalsList" class="space-y-5"></div>
                     <button id="openGoalModal"
                         class="w-full mt-4 bg-gold text-navy font-semibold py-3 rounded-lg hover:bg-opacity-90 transition">
                         + Nova Meta
                     </button>
                 </div>
 
-                <!-- Conversor de Moedas -->
+                <!-- Placeholder Conversor -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-                    <div class="opacity-60">
-                        <div
-                            class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
-                            💱</div>
-                        <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
-                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em
-                            tempo real.</p>
-                    </div>
+                    <p class="text-navy text-lg font-medium">Conversor de Moedas (em breve)</p>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <!-- ==================== MODAIS ==================== -->
-
-    <!-- Modal: Criar/Editar Conta -->
+    <!-- Modal Conta -->
     <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
             <h3 id="accountModalTitle" class="text-2xl font-bold mb-6">Nova Conta</h3>
@@ -247,234 +198,55 @@
         </div>
     </div>
 
-    <!-- Modal: Nova Transação -->
-    <div id="transactionModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-navy">Nova Transação</h3>
-                <button class="text-gray-400 hover:text-navy text-3xl"
-                    onclick="closeModal('transactionModal')">×</button>
-            </div>
-            <form>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Descrição</label>
-                        <input type="text" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor (€)</label>
-                        <input type="number" step="0.01" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Categoria</label>
-                        <select
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                            <option>Alimentação</option>
-                            <option>Transportes</option>
-                            <option>Lazer</option>
-                            <option>Salário</option>
-                            <option>Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Data</label>
-                        <input type="date" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Tipo</label>
-                        <div class="grid grid-cols-2 gap-4">
-                            <label class="flex items-center"><input type="radio" name="type" value="expense" checked
-                                    class="mr-2"><span class="text-red-600">Despesa</span></label>
-                            <label class="flex items-center"><input type="radio" name="type" value="income"
-                                    class="mr-2"><span class="text-green-600">Rendimento</span></label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-4 mt-8">
-                    <button type="button" onclick="closeModal('transactionModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
-                    <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Registar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Limites Mensais -->
-    <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div
-            class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 overflow-y-auto max-h-[90vh] modal-enter-active">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-navy">Editar Limites Mensais</h3>
-                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('limitsModal')">×</button>
-            </div>
-
-            <form id="limitsForm">
-                <!-- Seleção de Mês e Ano -->
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Mês</label>
-                        <select id="limitMonth"
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                            <option value="1">Janeiro</option>
-                            <option value="2">Fevereiro</option>
-                            <option value="3">Março</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Maio</option>
-                            <option value="6">Junho</option>
-                            <option value="7">Julho</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setembro</option>
-                            <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12" selected>Dezembro</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Ano</label>
-                        <input type="number" id="limitYear" value="2025" min="2020" max="2040"
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
+    <!-- Modal Transação (sem categoria, layout simples) -->
+    <div id="transactionModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
+            <h3 class="text-2xl font-bold mb-6">Nova Transação</h3>
+            <form id="transactionForm">
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Descrição</label>
+                    <input type="text" id="transactionDescription" required placeholder="ex: Supermercado Continente"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
                 </div>
 
-                <!-- Lista de Categorias (dinâmica) -->
-                <div id="categoriesList" class="space-y-6 mb-6">
-                    <!-- Categoria inicial 1 -->
-                    <div class="category-item flex items-center gap-4">
-                        <input type="text" value="Alimentação" required
-                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
-                            placeholder="Nome da categoria">
-                        <input type="number" value="500" min="0" step="10" required
-                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy"
-                            placeholder="Limite (€)">
-                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
-                            onclick="removeCategory(this)">×</button>
-                    </div>
-
-                    <!-- Categoria inicial 2 -->
-                    <div class="category-item flex items-center gap-4">
-                        <input type="text" value="Transportes" required
-                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                        <input type="number" value="150" min="0" step="10" required
-                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
-                            onclick="removeCategory(this)">×</button>
-                    </div>
-
-                    <!-- Categoria inicial 3 -->
-                    <div class="category-item flex items-center gap-4">
-                        <input type="text" value="Lazer" required
-                            class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                        <input type="number" value="200" min="0" step="10" required
-                            class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                        <button type="button" class="text-red-600 hover:text-red-800 font-bold"
-                            onclick="removeCategory(this)">×</button>
-                    </div>
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Conta</label>
+                    <select id="transactionAccount" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                        <option value="">Selecione uma conta</option>
+                    </select>
                 </div>
 
-                <!-- Botão Adicionar Categoria -->
-                <button type="button" id="addCategoryBtn"
-                    class="w-full py-3 border-2 border-dashed border-gold text-gold font-semibold rounded-lg hover:bg-gold hover:text-navy transition mb-6">
-                    + Adicionar nova categoria
-                </button>
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Valor (€)</label>
+                    <input type="number" id="transactionAmount" step="0.01" min="0.01" required placeholder="0.00"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Tipo</label>
+                    <select id="transactionType" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                        <option value="expense">Despesa</option>
+                        <option value="income">Rendimento</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Data</label>
+                    <input type="date" id="transactionDate" required
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
 
                 <div class="flex gap-4">
-                    <button type="button" onclick="closeModal('limitsModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
+                    <button type="button" onclick="closeModal('transactionModal')"
+                        class="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-light-gray transition">
                         Cancelar
                     </button>
                     <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
-                        Guardar Limites
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Nova Meta -->
-    <div id="goalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-navy">Nova Meta Financeira</h3>
-                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('goalModal')">×</button>
-            </div>
-            <form>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
-                        <input type="text" required placeholder="ex: Fundo de Emergência"
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
-                        <input type="number" step="0.01" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
-                        <input type="number" step="0.01" value="0"
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Data limite</label>
-                        <input type="date" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                </div>
-                <div class="flex gap-4 mt-8">
-                    <button type="button" onclick="closeModal('goalModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">Cancelar</button>
-                    <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">Criar
-                        Meta</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Editar Meta -->
-    <div id="editGoalModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-enter-active">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-navy">Editar Meta</h3>
-                <button class="text-gray-400 hover:text-navy text-3xl" onclick="closeModal('editGoalModal')">×</button>
-            </div>
-            <form id="editGoalForm">
-                <input type="hidden" id="editGoalId">
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Nome da meta</label>
-                        <input type="text" id="editGoalName" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor alvo (€)</label>
-                        <input type="number" id="editGoalTarget" step="0.01" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Valor atual (€)</label>
-                        <input type="number" id="editGoalCurrent" step="0.01" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-navy font-medium mb-2">Data limite</label>
-                        <input type="date" id="editGoalDeadline" required
-                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-                    </div>
-                </div>
-                <div class="flex gap-4 mt-8">
-                    <button type="button" onclick="closeModal('editGoalModal')"
-                        class="flex-1 py-3 border border-gray-300 text-navy rounded-lg hover:bg-light-gray transition">
-                        Cancelar
-                    </button>
-                    <button type="submit"
-                        class="flex-1 bg-gold text-navy font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
-                        Guardar Alterações
+                        class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Registar Transação
                     </button>
                 </div>
             </form>
@@ -488,228 +260,250 @@
         </div>
     </footer>
 
-    <!-- Script para Modais + Auth -->
+    <!-- Script -->
     <script>
-        // Função genérica para abrir/fechar modais
+        // Dados simulados
+        let accounts = JSON.parse(localStorage.getItem('simulatedAccounts')) || [];
+        let transactions = JSON.parse(localStorage.getItem('simulatedTransactions')) || [];
+
+        function saveAccounts() { localStorage.setItem('simulatedAccounts', JSON.stringify(accounts)); }
+        function saveTransactions() { localStorage.setItem('simulatedTransactions', JSON.stringify(transactions)); }
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+        // Modais genéricos
         function openModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
         }
-
         function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+        document.querySelectorAll('[id$="Modal"]').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }));
+
+        // Contas 
+        function loadAccounts() {
+            const list = document.getElementById('accountsList');
+            list.innerHTML = '';
+
+            if (accounts.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhuma conta registada ainda.</p>';
+                return;
+            }
+
+            accounts.forEach(acc => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
+                div.innerHTML = `
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-2xl">💳</div>
+                <div>
+                    <p class="font-semibold text-navy">${acc.nome}</p>
+                    <p class="text-sm text-gray-500">${acc.tipo.charAt(0).toUpperCase() + acc.tipo.slice(1)}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold text-navy">€${parseFloat(acc.saldo_atual).toFixed(2)}</p>
+                <div class="mt-2 space-x-4">
+                    <button onclick="openEditAccountModal('${acc.id}', '${acc.nome.replace(/'/g, "\\'")}', '${acc.tipo}', ${acc.saldo_atual})"
+                        class="text-sm text-gold underline hover:text-opacity-80">Editar</button>
+                    <button onclick="deleteAccount('${acc.id}')"
+                        class="text-sm text-red-600 underline hover:text-red-800">Excluir</button>
+                </div>
+            </div>
+        `;
+                list.appendChild(div);
+            });
         }
 
-        // Abrir modais pelos botões
-        document.getElementById('openTransactionModal')?.addEventListener('click', () => openModal('transactionModal'));
-        document.getElementById('openLimitsModal')?.addEventListener('click', () => openModal('limitsModal'));
-        document.getElementById('openGoalModal')?.addEventListener('click', () => openModal('goalModal'));
+        function openEditAccountModal(id, nome, tipo, saldo_atual) {
+            document.getElementById('accountModalTitle').textContent = 'Editar Conta';
+            document.getElementById('accountId').value = id;
+            document.getElementById('accountName').value = nome;
+            document.getElementById('accountType').value = tipo;
+            document.getElementById('accountBalance').value = saldo_atual.toFixed(2);
+            openModal('accountModal');
+        }
 
-        // Fechar ao clicar fora do conteúdo
-        document.querySelectorAll('[id$="Modal"]').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal(modal.id);
-            });
-        });
-
-        // Abrir modal para nova conta
-        document.getElementById('openAccountModal')?.addEventListener('click', () => {
+        document.getElementById('openAccountModal').addEventListener('click', () => {
             document.getElementById('accountModalTitle').textContent = 'Nova Conta';
             document.getElementById('accountForm').reset();
             document.getElementById('accountId').value = '';
             openModal('accountModal');
         });
 
-        // Função para abrir edição
-        function openEditAccountModal(id, nome, tipo, saldo_atual) {
-            document.getElementById('accountModalTitle').textContent = 'Editar Conta';
-            document.getElementById('accountId').value = id;
-            document.getElementById('accountName').value = nome;
-            document.getElementById('accountType').value = tipo;
-            document.getElementById('accountBalance').value = saldo_atual;
-            openModal('accountModal');
-        }
-
-        // Carregar contas do utilizador
-        async function loadAccounts() {
-            try {
-                const response = await fetch('/api/accounts'); 
-                if (!response.ok) throw new Error('Erro ao carregar');
-                const accounts = await response.json();
-
-                const list = document.getElementById('accountsList');
-                list.innerHTML = '';
-
-                if (accounts.length === 0) {
-                    document.getElementById('noAccountsMessage').classList.remove('hidden');
-                    return;
-                }
-                document.getElementById('noAccountsMessage').classList.add('hidden');
-
-                accounts.forEach(acc => {
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
-                    div.innerHTML = `
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center text-2xl">💳</div>
-                    <div>
-                        <p class="font-semibold">${acc.nome}</p>
-                        <p class="text-sm text-gray-500">${acc.tipo.charAt(0).toUpperCase() + acc.tipo.slice(1)}</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-xl font-bold">€${parseFloat(acc.saldo_atual).toFixed(2)}</p>
-                    <button onclick="openEditAccountModal(${acc.id}, '${acc.nome.replace(/'/g, "\\'")}', '${acc.tipo}', ${acc.saldo_atual})"
-                        class="text-sm text-gold underline mt-1">Editar</button>
-                </div>
-            `;
-                    list.appendChild(div);
-                });
-            } catch (err) {
-                console.error('Erro ao carregar contas:', err);
-            }
-        }
-
-        // Submissão do formulário (criar ou editar)
-        document.getElementById('accountForm').addEventListener('submit', async (e) => {
+        document.getElementById('accountForm').addEventListener('submit', e => {
             e.preventDefault();
             const id = document.getElementById('accountId').value;
-            const name = document.getElementById('accountName').value;
-            const type = document.getElementById('accountType').value;
-            const balance = parseFloat(document.getElementById('accountBalance').value);
+            const nome = document.getElementById('accountName').value.trim();
+            const tipo = document.getElementById('accountType').value;
+            const saldo = parseFloat(document.getElementById('accountBalance').value);
 
-            const url = id ? `/api/accounts/${id}` : '/api/accounts';
-            const method = id ? 'PUT' : 'POST';
+            if (isNaN(saldo) || saldo < 0) return alert('Saldo inválido.');
 
-            try {
-                const res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, type, balance })
-                });
-                if (!res.ok) throw new Error('Falha ao guardar');
-                closeModal('accountModal');
-                loadAccounts();
-            } catch (err) {
-                alert('Erro: ' + err.message);
+            if (id) {
+                const acc = accounts.find(a => a.id === id);
+                if (acc) { acc.nome = nome; acc.tipo = tipo; acc.saldo_inicial = saldo; acc.saldo_atual = saldo; }
+            } else {
+                accounts.push({ id: generateId(), nome, tipo, saldo_inicial: saldo, saldo_atual: saldo });
             }
-        });
-
-        // Chamar ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            // ... código existente
+            saveAccounts();
             loadAccounts();
+            closeModal('accountModal');
         });
 
-        // Abrir modal de edição com dados da meta
-        function openEditGoalModal(btn) {
-            const goalItem = btn.closest('.goal-item');
-            const name = goalItem.dataset.name;
-            const current = goalItem.dataset.current;
-            const target = goalItem.dataset.target;
-            const deadline = goalItem.dataset.deadline;
-            const id = goalItem.dataset.id;
-
-            document.getElementById('editGoalId').value = id;
-            document.getElementById('editGoalName').value = name;
-            document.getElementById('editGoalCurrent').value = current;
-            document.getElementById('editGoalTarget').value = target;
-            document.getElementById('editGoalDeadline').value = deadline;
-
-            openModal('editGoalModal');
+        // Transações
+        function loadAccountOptions() {
+            const select = document.getElementById('transactionAccount');
+            select.innerHTML = '<option value="">Selecione uma conta</option>';
+            if (accounts.length === 0) {
+                select.innerHTML += '<option disabled>Nenhuma conta criada</option>';
+                return;
+            }
+            accounts.forEach(acc => {
+                const opt = document.createElement('option');
+                opt.value = acc.id;
+                opt.textContent = `${acc.nome} (€${parseFloat(acc.saldo_atual).toFixed(2)})`;
+                select.appendChild(opt);
+            });
         }
 
-        // Guardar alterações da edição da meta
-        document.getElementById('editGoalForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editGoalId').value;
-            const name = document.getElementById('editGoalName').value;
-            const current = parseFloat(document.getElementById('editGoalCurrent').value);
-            const target = parseFloat(document.getElementById('editGoalTarget').value);
-            const deadline = document.getElementById('editGoalDeadline').value;
+        // Transações 
+        function loadTransactions() {
+            const container = document.getElementById('transactionsList');
+            container.innerHTML = '';
 
-            const goalItem = document.querySelector(`.goal-item[data-id="${id}"]`);
-            if (goalItem) {
-                // Atualiza dados
-                goalItem.dataset.name = name;
-                goalItem.dataset.current = current;
-                goalItem.dataset.target = target;
-                goalItem.dataset.deadline = deadline;
-
-                // Atualiza visual
-                goalItem.querySelector('p.font-semibold').textContent = name;
-                goalItem.querySelector('p.text-sm.text-gray-500').textContent = `Até ${new Date(deadline).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' })}`;
-                goalItem.querySelector('span.font-bold').textContent = `€${current.toFixed(2)} / €${target.toFixed(2)}`;
-
-                const percentage = (current / target) * 100;
-                const bar = goalItem.querySelector('.h-3.rounded-full');
-                bar.style.width = `${Math.min(percentage, 100)}%`;
-                bar.className = percentage >= 100 ? 'bg-green-500 h-3 rounded-full' : 'bg-gold h-3 rounded-full';
+            if (transactions.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhuma transação registada ainda.</p>';
+                return;
             }
 
-            closeModal('editGoalModal');
-            // Futuro: fetch('/api/goals/' + id, { method: 'PUT', body: JSON.stringify(...) })
-        });
+            transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Auth script 
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoutBtn = document.getElementById('btn-logout');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    window.location.href = '/logout';
-                });
-            }
-
-            fetch('/api/user')
-                .then(response => {
-                    if (!response.ok) throw new Error("Sessão inválida");
-                    return response.json();
-                })
-                .then(data => {
-                    const mainTitleName = document.getElementById('userName');
-                    if (mainTitleName && data.name) mainTitleName.textContent = data.name.split(' ')[0];
-                    const headerName = document.getElementById('headerName');
-                    if (headerName && data.name) headerName.textContent = data.name.split(' ')[0];
-                })
-                .catch(() => {
-                    window.location.href = '/login';
-                });
-        });
-
-        // Adicionar nova categoria
-        document.getElementById('addCategoryBtn')?.addEventListener('click', () => {
-            const list = document.getElementById('categoriesList');
-            const newItem = document.createElement('div');
-            newItem.className = 'category-item flex items-center gap-4';
-            newItem.innerHTML = `
-            <input type="text" required placeholder="Nome da categoria"
-                   class="flex-1 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-            <input type="number" min="0" step="10" required placeholder="Limite (€)"
-                   class="w-32 px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold text-navy">
-            <button type="button" class="text-red-600 hover:text-red-800 font-bold" onclick="removeCategory(this)">×</button>
+            transactions.forEach(trans => {
+                const accountName = accounts.find(a => a.id === trans.account_id)?.nome || 'Desconhecida';
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
+                div.innerHTML = `
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 ${trans.type === 'expense' ? 'bg-red-100' : 'bg-green-100'} rounded-full flex items-center justify-center text-2xl">
+                    ${trans.type === 'expense' ? '🛒' : '💰'}
+                </div>
+                <div>
+                    <p class="font-semibold text-navy">${trans.description}</p>
+                    <p class="text-sm text-gray-500">${new Date(trans.date).toLocaleDateString('pt-PT')} • ${accountName}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold ${trans.type === 'expense' ? 'text-red-600' : 'text-green-600'}">
+                    ${trans.type === 'expense' ? '-' : '+'} €${parseFloat(trans.amount).toFixed(2)}
+                </p>
+                <button onclick="deleteTransaction('${trans.id}')"
+                    class="text-sm text-red-600 underline hover:text-red-800 mt-2 block">Excluir</button>
+            </div>
         `;
-            list.appendChild(newItem);
-        });
+                container.appendChild(div);
+            });
+        }
 
-        // Remover categoria
-        function removeCategory(btn) {
-            if (document.querySelectorAll('.category-item').length > 1) { // mínimo 1 categoria
-                btn.parentElement.remove();
+        function updateAccountBalance(accountId, amount, type) {
+            const acc = accounts.find(a => a.id === accountId);
+            if (acc) {
+                type === 'expense' ? acc.saldo_atual -= amount : acc.saldo_atual += amount;
+                saveAccounts();
+                loadAccounts();
             }
         }
 
-        // Opcional: ao submeter (futuro POST)
-        document.getElementById('limitsForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Aqui farás fetch('/api/limits', { method: 'POST', body: ... })
-            alert('Limites guardados! (simulação)');
-            closeModal('limitsModal');
+        document.getElementById('openTransactionModal').addEventListener('click', () => {
+            loadAccountOptions();
+            document.getElementById('transactionDate').value = '2025-12-26'; // data atual conforme contexto
+            openModal('transactionModal');
         });
-    </script>
 
+        document.getElementById('transactionForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const description = document.getElementById('transactionDescription').value.trim();
+            const accountId = document.getElementById('transactionAccount').value;
+            const amount = parseFloat(document.getElementById('transactionAmount').value);
+            const type = document.getElementById('transactionType').value;
+            const date = document.getElementById('transactionDate').value;
+
+            if (!accountId) return alert('Selecione uma conta.');
+            if (isNaN(amount) || amount <= 0) return alert('Valor inválido.');
+
+            transactions.push({
+                id: generateId(),
+                description,
+                amount,
+                type,
+                date,
+                account_id: accountId
+            });
+
+            saveTransactions();
+            loadTransactions();
+            updateAccountBalance(accountId, amount, type);
+
+            e.target.reset();
+            document.getElementById('transactionDate').value = '2025-12-26';
+            closeModal('transactionModal');
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAccounts();
+            loadTransactions();
+
+            // Auth placeholder
+            fetch('/api/user')
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(data => {
+                    if (data.name) {
+                        const name = data.name.split(' ')[0];
+                        document.getElementById('userName').textContent = name;
+                        document.getElementById('headerName').textContent = name;
+                    }
+                })
+                .catch(() => window.location.href = '/login');
+
+            document.getElementById('btn-logout')?.addEventListener('click', () => window.location.href = '/logout');
+        });
+
+        function deleteAccount(id) {
+            if (confirm('Tens a certeza que queres excluir esta conta? Esta ação não pode ser desfeita.')) {
+                accounts = accounts.filter(a => a.id !== id);
+                // Também remove transações associadas a esta conta
+                transactions = transactions.filter(t => t.account_id !== id);
+                saveAccounts();
+                saveTransactions();
+                loadAccounts();
+                loadTransactions();
+            }
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('Tens a certeza que queres excluir esta transação?')) {
+                const trans = transactions.find(t => t.id === id);
+                if (trans) {
+                    // Reverte o saldo da conta
+                    const acc = accounts.find(a => a.id === trans.account_id);
+                    if (acc) {
+                        if (trans.type === 'expense') {
+                            acc.saldo_atual += trans.amount;
+                        } else {
+                            acc.saldo_atual -= trans.amount;
+                        }
+                        saveAccounts();
+                        loadAccounts();
+                    }
+                }
+                transactions = transactions.filter(t => t.id !== id);
+                saveTransactions();
+                loadTransactions();
+            }
+        }
+    </script>
 </body>
 
 </html>
