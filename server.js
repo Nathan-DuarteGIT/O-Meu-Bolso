@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 
 import indexRouter from './src/routes/index.js';
 import authRouter from './src/routes/auth.js';
+import apiRoutes from './src/routes/routes.js'; 
 
 // NOVIDADE: sessão + proteção
 import session from 'express-session';
@@ -51,7 +52,7 @@ app.use('/', authRouter);
 app.get('/dashboard', requireAuth, (req, res) => {
     res.sendFile('dashboard.html', { root: './src/views' });
 });
-
+app.use('/api', apiRoutes);
 // API para o nome do utilizador no dashboard
 app.get('/api/user', requireAuth, (req, res) => {
     res.json({ name: req.user.name });
