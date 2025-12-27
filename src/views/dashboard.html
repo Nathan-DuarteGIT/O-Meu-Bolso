@@ -81,7 +81,6 @@
         <!-- Layout Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Coluna esquerda: Contas, Despesas & Rendimentos e Limites Mensais -->
             <div class="lg:col-span-2 space-y-8">
 
                 <!-- 1. Contas -->
@@ -127,10 +126,9 @@
                 </div>
             </div>
 
-            <!-- Coluna direita: Metas Ativas e Conversor de Moedas -->
             <div class="space-y-8">
 
-                <!-- Metas Financeiras -->
+                <!-- 4. Metas Financeiras -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold text-navy mb-6">Metas Ativas</h2>
                     <div id="goalsList" class="space-y-5">
@@ -142,7 +140,7 @@
                     </button>
                 </div>
 
-                <!-- Conversor de Moedas -->
+                <!-- 5. Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
                     <div class="opacity-60">
                         <div
@@ -324,11 +322,13 @@
         </div>
     </div>
 
-    <!-- Modal Meta -->
+    <!-- Modal Metas -->
     <div id="goalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
-            <h3 class="text-2xl font-bold mb-6">Nova Meta Financeira</h3>
+            <h3 id="goalModalTitle" class="text-2xl font-bold mb-6">Nova Meta Financeira</h3>
             <form id="goalForm">
+                <input type="hidden" id="goalId" value="">
+
                 <div class="mb-6">
                     <label class="block font-medium mb-2">O que queres alcançar?</label>
                     <input type="text" id="goalName" required placeholder="ex: Viagem ao Japão"
@@ -341,7 +341,12 @@
                 </div>
                 <div class="mb-6">
                     <label class="block font-medium mb-2">Valor já poupado (€)</label>
-                    <input type="number" id="goalCurrent" step="0.01" min="0" required placeholder="0.00"
+                    <input type="number" id="goalCurrent" step="0.01" min="0" value="0" required placeholder="0.00"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Data limite</label>
+                    <input type="date" id="goalDeadline" required
                         class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
                 </div>
                 <div class="flex gap-4">
@@ -351,7 +356,7 @@
                     </button>
                     <button type="submit"
                         class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
-                        Criar Meta
+                        <span id="goalSubmitText">Criar Meta</span>
                     </button>
                 </div>
             </form>
@@ -551,9 +556,9 @@
                     const tDate = new Date(t.date);
                     const tMonth = tDate.getMonth() + 1;
                     const tYear = tDate.getFullYear();
-                    const budget = budgets.find(b => 
-                        b.category === t.category && 
-                        b.month === tMonth && 
+                    const budget = budgets.find(b =>
+                        b.category === t.category &&
+                        b.month === tMonth &&
                         b.year === tYear
                     );
                     if (budget) budget.current += t.amount;
@@ -567,19 +572,19 @@
             const list = document.getElementById('limitsList');
             list.innerHTML = '';
             let monthBudgets = budgets.filter(b => b.month === currentLimitsMonth && b.year === currentLimitsYear);
-            
+
             if (monthBudgets.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhum limite mensal definido.</p>';
                 return;
             }
-            
+
             monthBudgets.forEach(budget => {
                 const spent = budget.current || 0;
                 const limit = budget.limit || 0;
                 const percentage = limit > 0 ? (spent / limit) * 100 : 0;
                 const isOver = spent > limit;
                 const barColor = isOver ? 'bg-red-600' : (percentage >= 90 ? 'bg-yellow-500' : 'bg-green-500');
-                
+
                 const div = document.createElement('div');
                 div.className = `bg-light-gray/20 p-6 rounded-2xl shadow-md border-l-8 ${isOver ? 'border-red-600' : 'border-green-500'}`;
                 div.innerHTML = `
@@ -612,7 +617,7 @@
             openModal('limitsModal');
         });
 
-        window.openEditLimitModal = function(id) {
+        window.openEditLimitModal = function (id) {
             const budget = budgets.find(b => b.id === id);
             if (budget) {
                 document.getElementById('limitModalTitle').textContent = 'Editar Limite';
@@ -625,8 +630,8 @@
             }
         };
 
-        // OTIMIZADO: Função de exclusão com recálculo e atualização imediata
-        window.deleteLimit = function(id) {
+        // Função de exclusão com recálculo e atualização imediata
+        window.deleteLimit = function (id) {
             if (confirm('Tens a certeza que queres excluir este limite?')) {
                 budgets = budgets.filter(b => b.id !== id);
                 saveBudgets();
@@ -656,10 +661,10 @@
             } else {
                 budgets.push({ id: generateId(), category, limit, month, year, current: 0 });
             }
-            
+
             currentLimitsMonth = month;
             currentLimitsYear = year;
-            
+
             calculateBudgetsProgress();
             closeModal('limitsModal');
         });
@@ -668,34 +673,112 @@
         function loadGoals() {
             const list = document.getElementById('goalsList');
             list.innerHTML = '';
+            if (goals.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 py-6">Nenhuma meta definida ainda.</p>';
+                return;
+            }
+
             goals.forEach(goal => {
-                const perc = Math.min((goal.current / goal.target) * 100, 100);
+                const perc = goal.target > 0 ? Math.min((goal.current / goal.target) * 100, 100) : 0;
+                const deadline = goal.deadline ? new Date(goal.deadline).toLocaleDateString('pt-PT') : 'Sem data';
+
                 const div = document.createElement('div');
-                div.className = 'bg-light-gray/10 p-4 rounded-xl border border-light-gray/30';
+                div.className = 'bg-light-gray/20 p-6 rounded-2xl shadow-md border-l-8 border-gold';
+
                 div.innerHTML = `
-                    <div class="flex justify-between mb-2">
-                        <span class="font-bold text-navy">${goal.name}</span>
-                        <span class="text-gold font-bold">${perc.toFixed(0)}%</span>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-navy">${goal.name}</h3>
+                            <p class="text-sm text-gray-600 mt-1">Prazo: ${deadline}</p>
+                            <div class="mt-2">
+                                <span class="text-lg font-bold text-navy">€${parseFloat(goal.current).toFixed(2)}</span>
+                                <span class="text-sm text-gray-500"> de €${parseFloat(goal.target).toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button onclick="openEditGoalModal('${goal.id}')" class="text-gold hover:text-opacity-80 text-xl" title="Editar">✏️</button>
+                            <button onclick="deleteGoal('${goal.id}')" class="text-red-600 hover:text-red-800 text-xl" title="Excluir">🗑️</button>
+                        </div>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                        <div class="bg-gold h-2.5 rounded-full" style="width: ${perc}%"></div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="bg-gold h-full transition-all duration-500" style="width: ${perc}%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-sm">
+                        <span>${perc.toFixed(0)}% concluído</span>
                     </div>
                 `;
                 list.appendChild(div);
             });
         }
 
-        document.getElementById('openGoalModal').addEventListener('click', () => openModal('goalModal'));
+        // Função para abrir modal de edição
+        window.openEditGoalModal = function (id) {
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                document.getElementById('goalModalTitle').textContent = 'Editar Meta Financeira';
+                document.getElementById('goalSubmitText').textContent = 'Guardar Alterações';
+                document.getElementById('goalId').value = goal.id;
+                document.getElementById('goalName').value = goal.name;
+                document.getElementById('goalTarget').value = goal.target;
+                document.getElementById('goalCurrent').value = goal.current;
+                document.getElementById('goalDeadline').value = goal.deadline || '';
+                openModal('goalModal');
+            }
+        };
+
+        // Função para excluir meta
+        window.deleteGoal = function (id) {
+            if (confirm('Tens a certeza que queres excluir esta meta?')) {
+                goals = goals.filter(g => g.id !== id);
+                saveGoals();
+                loadGoals();
+            }
+        };
+
+        document.getElementById('openGoalModal').addEventListener('click', () => {
+            document.getElementById('goalModalTitle').textContent = 'Nova Meta Financeira';
+            document.getElementById('goalSubmitText').textContent = 'Criar Meta';
+            document.getElementById('goalForm').reset();
+            document.getElementById('goalId').value = '';
+            document.getElementById('goalCurrent').value = '0';
+            document.getElementById('goalDeadline').value = ''; // opcional: definir data padrão
+            openModal('goalModal');
+        });
+
         document.getElementById('goalForm').addEventListener('submit', e => {
             e.preventDefault();
-            const name = document.getElementById('goalName').value;
+            const id = document.getElementById('goalId').value;
+            const name = document.getElementById('goalName').value.trim();
             const target = parseFloat(document.getElementById('goalTarget').value);
-            const current = parseFloat(document.getElementById('goalCurrent').value);
-            goals.push({ id: generateId(), name, target, current });
+            const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
+            const deadline = document.getElementById('goalDeadline').value;
+
+            if (isNaN(target) || target <= 0) return alert('Valor total inválido.');
+            if (current > target) return alert('Valor poupado não pode ser maior que o total.');
+
+            if (id) {
+                // Editar
+                const goal = goals.find(g => g.id === id);
+                if (goal) {
+                    goal.name = name;
+                    goal.target = target;
+                    goal.current = current;
+                    goal.deadline = deadline;
+                }
+            } else {
+                // Criar nova
+                goals.push({
+                    id: generateId(),
+                    name,
+                    target,
+                    current,
+                    deadline
+                });
+            }
+
             saveGoals();
             loadGoals();
             closeModal('goalModal');
-            e.target.reset();
         });
 
         // INICIALIZAÇÃO
