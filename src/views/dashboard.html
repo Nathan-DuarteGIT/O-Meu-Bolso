@@ -359,6 +359,57 @@
         </div>
     </div>
 
+    <!-- Modal Gestão de Categorias -->
+    <div id="categoriesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg text-navy max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Gestão de Categorias</h3>
+                <button onclick="closeModal('categoriesModal')"
+                    class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <!-- Formulário para adicionar/editar categoria -->
+            <form id="categoryForm" class="mb-8 bg-light-gray/10 p-5 rounded-xl">
+                <input type="hidden" id="categoryId" value="">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="md:col-span-2">
+                        <label class="block font-medium mb-2">Nome da categoria</label>
+                        <input type="text" id="categoryName" required placeholder="ex: Educação"
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-2">Tipo</label>
+                        <select id="categoryType" required
+                            class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                            <option value="expense">Apenas despesa</option>
+                            <option value="income">Apenas rendimento</option>
+                            <option value="both">Ambos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="resetCategoryForm()"
+                        class="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        <span id="categorySubmitText">Adicionar Categoria</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Lista de categorias existentes -->
+            <div id="categoriesList" class="space-y-3">
+                <!-- Carregadas dinamicamente -->
+            </div>
+
+            <div class="mt-6 text-center text-sm text-gray-500">
+                As categorias aqui criadas aparecem automaticamente nas transações e limites.
+            </div>
+        </div>
+    </div>
+
     <script>
         // Variáveis de Estado
         let accounts = [];
@@ -548,6 +599,30 @@
         document.getElementById('transactionType')?.addEventListener('change', (e) => {
             loadCategoryOptions(e.target.value);
         });
+        // Melhor: alterar diretamente no load do modal
+        const originalOpenTransactionModal = document.getElementById('openTransactionModal').onclick;
+        document.getElementById('openTransactionModal').onclick = function () {
+            loadAccountOptions();
+            const currentType = document.getElementById('transactionType').value || 'expense';
+            loadCategoryOptions(currentType);
+            document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
+
+            // Adiciona o botão "Gerir categorias" abaixo do select
+            const categoryDiv = document.querySelector('#transactionModal .mb-6:nth-last-child(3)'); // o penúltimo mb-6 antes da data
+            if (categoryDiv && !categoryDiv.querySelector('.manage-categories-btn')) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'manage-categories-btn mt-3 text-gold underline text-sm hover:text-opacity-80';
+                btn.textContent = 'Gerir categorias';
+                btn.onclick = () => {
+                    renderCategoriesList();
+                    openModal('categoriesModal');
+                };
+                categoryDiv.appendChild(btn);
+            }
+
+            openModal('transactionModal');
+        };
 
         function renderTransactions() {
             const container = document.getElementById('transactionsList');
@@ -658,7 +733,7 @@
         });
 
 
-        // --- GESTÃO DE ORÇAMENTOS (BUDGETS) ---
+        // --- GESTÃO DE LIMITES (BUDGETS) ---
 
         function renderBudgets(calculatedBudgets) {
             const list = document.getElementById('limitsList');
@@ -788,6 +863,40 @@
                 }
             } catch (err) { showError(err.message); }
         });
+
+        const originalOpenLimitsModal = document.getElementById('openLimitsModal').onclick;
+        document.getElementById('openLimitsModal').onclick = function () {
+            document.getElementById('limitModalTitle').textContent = 'Novo Orçamento';
+            document.getElementById('limitForm').reset();
+
+            const limitSelect = document.getElementById('limitCategory');
+            limitSelect.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.nome;
+                limitSelect.appendChild(opt);
+            });
+
+            document.getElementById('limitMonth').value = new Date().getMonth() + 1;
+            document.getElementById('limitYear').value = new Date().getFullYear();
+
+            // Adiciona o botão "Gerir categorias"
+            const categoryDiv = limitSelect.parentElement;
+            if (!categoryDiv.querySelector('.manage-categories-btn')) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'manage-categories-btn mt-3 text-gold underline text-sm hover:text-opacity-80 block';
+                btn.textContent = 'Gerir categorias';
+                btn.onclick = () => {
+                    renderCategoriesList();
+                    openModal('categoriesModal');
+                };
+                categoryDiv.appendChild(btn);
+            }
+
+            openModal('limitsModal');
+        };
 
         // Listener para abrir modal de limites e (opcional) carregar categorias lá também
         document.getElementById('openLimitsModal').addEventListener('click', () => {
@@ -925,6 +1034,121 @@
             openModal('goalModal');
         });
 
+        // Função para carregar e renderizar a lista de categorias no modal
+        function renderCategoriesList() {
+            const list = document.getElementById('categoriesList');
+            list.innerHTML = '';
+
+            if (!categories || categories.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhuma categoria criada ainda.</p>';
+                return;
+            }
+
+            categories.forEach(cat => {
+                const typeLabel = cat.type === 'expense' ? 'Despesa' :
+                    cat.type === 'income' ? 'Rendimento' :
+                        'Ambos';
+
+                const typeColor = cat.type === 'expense' ? 'text-red-600' :
+                    cat.type === 'income' ? 'text-green-600' :
+                        'text-gold';
+
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-light-gray/20 p-4 rounded-xl';
+                div.innerHTML = `
+                <div>
+                    <p class="font-semibold">${cat.nome}</p>
+                    <p class="text-sm text-gray-500"><span class="${typeColor}">${typeLabel}</span></p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="openEditCategory('${cat.id}', '${cat.nome.replace(/'/g, "\\'")}', '${cat.type}')"
+                        class="text-gold hover:text-opacity-80 text-xl" title="Editar">Edit</button>
+                    <button onclick="deleteCategory('${cat.id}')"
+                        class="text-red-600 hover:text-red-800 text-xl" title="Excluir">Delete</button>
+                </div>
+            `;
+                list.appendChild(div);
+            });
+        }
+
+        // Abre o modal de edição de categoria
+        window.openEditCategory = function (id, name, type) {
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryName').value = name;
+            document.getElementById('categoryType').value = type;
+            document.getElementById('categorySubmitText').textContent = 'Guardar Alterações';
+        };
+
+        // Reseta o formulário de categoria
+        function resetCategoryForm() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categorySubmitText').textContent = 'Adicionar Categoria';
+        }
+
+        // Excluir categoria
+        window.deleteCategory = async function (id) {
+            if (!confirm('Tens a certeza que queres excluir esta categoria? Transações existentes manterão o nome antigo.')) return;
+
+            try {
+                const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    categories = categories.filter(c => c.id !== id);
+                    renderCategoriesList();
+                    updateCategorySelects(); // Atualiza os selects dos outros modais
+                }
+            } catch (e) { console.error(e); }
+        };
+
+        // Atualiza os <select> de categoria nos modais de transação e limite
+        function updateCategorySelects() {
+            // Para transações
+            loadCategoryOptions(document.getElementById('transactionType')?.value || 'expense');
+
+            // Para limites
+            const limitSelect = document.getElementById('limitCategory');
+            if (limitSelect) {
+                limitSelect.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+                categories.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome;
+                    limitSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // Formulário de categoria (criar/editar)
+        document.getElementById('categoryForm').addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const id = document.getElementById('categoryId').value;
+            const nome = document.getElementById('categoryName').value.trim();
+            const type = document.getElementById('categoryType').value;
+
+            if (!nome) return alert('O nome da categoria é obrigatório.');
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `/api/categories/${id}` : '/api/categories';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, type })
+                });
+
+                if (res.ok) {
+                    await fetchAllData(); // Recarrega categorias atualizadas
+                    renderCategoriesList();
+                    updateCategorySelects();
+                    resetCategoryForm();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Erro ao guardar categoria');
+                }
+            } catch (e) { console.error(e); }
+        });
 
         // --- INICIALIZAÇÃO ---
 
