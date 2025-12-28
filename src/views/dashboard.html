@@ -142,18 +142,36 @@
 
                 <!-- 5. Conversor de Moedas -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-                    <div class="opacity-60">
-                        <div
-                            class="w-20 h-20 mx-auto mb-4 bg-light-gray/30 rounded-full flex items-center justify-center text-5xl">
-                            💱
+                    <div class="flex items-center space-x-2 mb-6">
+                        <span class="text-2xl">💱</span>
+                        <h3 class="text-xl font-bold text-navy">Conversor (Base: EUR)</h3>
+                    </div>
+
+                    <div class="mb-6 relative">
+                        <label class="block text-xs font-bold text-gold uppercase tracking-wider mb-1">Valor em
+                            Euro</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-4 text-navy font-bold text-lg">€</span>
+                            <input type="number" id="euroInput" value="1" min="0" step="1"
+                                class="w-full pl-10 pr-4 py-3 bg-light-gray/20 border border-light-gray rounded-xl focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-2xl font-black text-navy transition-all"
+                                placeholder="0">
                         </div>
-                        <h3 class="text-xl font-bold text-navy mb-2">Conversor de Moedas</h3>
-                        <p class="text-sm text-gray-500">Funcionalidade em desenvolvimento.<br>Em breve com taxas em
-                            tempo real.</p>
+                    </div>
+
+                    <div id="currencyGrid"
+                        class="grid grid-cols-2 gap-3 overflow-y-auto max-h-80 pr-1 custom-scrollbar">
+                        <div class="col-span-2 text-center text-gray-400 py-4">
+                            A carregar taxas...
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="text-xs text-gray-400" id="lastUpdateText">Taxas atualizadas diariamente</p>
                     </div>
                 </div>
-
             </div>
+
+        </div>
         </div>
     </main>
 

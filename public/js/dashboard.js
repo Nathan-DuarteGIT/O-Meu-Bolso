@@ -786,3 +786,108 @@
             // 3. Botão Logout
             document.getElementById('btn-logout')?.addEventListener('click', () => window.location.href = '/logout');
         });
+
+
+
+/* ==========================================
+   CONVERSOR DE MOEDAS EM TEMPO REAL
+   ========================================== */
+
+// Configuração
+const apiHost = 'https://api.frankfurter.app';
+// Define aqui as moedas que queres que apareçam na grelha
+const targetCurrencies = [
+    { code: 'USD', flag: '🇺🇸', name: 'Dólar' },
+    { code: 'BRL', flag: '🇧🇷', name: 'Real' },
+    { code: 'GBP', flag: '🇬🇧', name: 'Libra' },
+    { code: 'JPY', flag: '🇯🇵', name: 'Iene' },
+    { code: 'CHF', flag: '🇨🇭', name: 'Franco' },
+    { code: 'CNY', flag: '🇨🇳', name: 'Yuan' }
+];
+
+let currentRates = {}; // Variável para guardar as taxas
+
+document.addEventListener('DOMContentLoaded', () => {
+    initConverter();
+});
+
+async function initConverter() {
+    const grid = document.getElementById('currencyGrid');
+    const input = document.getElementById('euroInput');
+    const updateText = document.getElementById('lastUpdateText');
+
+    try {
+        // 1. Buscar taxas UMA vez ao carregar a página
+        const response = await fetch(`${apiHost}/latest?from=EUR`);
+        const data = await response.json();
+        
+        currentRates = data.rates;
+        updateText.textContent = `Taxas de referência: ${data.date}`;
+
+        // 2. Renderizar a estrutura inicial
+        renderCurrencyCards();
+
+        // 3. Adicionar evento de "input" para cálculo instantâneo
+        input.addEventListener('input', (e) => {
+            calculateValues(e.target.value);
+        });
+
+        // 4. Calcular valor inicial (1€)
+        calculateValues(input.value);
+
+    } catch (error) {
+        console.error('Erro ao carregar taxas:', error);
+        grid.innerHTML = `
+            <div class="col-span-2 text-center text-red-500 py-2 text-sm">
+                Falha ao ligar à API. Verifique a internet.
+            </div>`;
+    }
+}
+
+function renderCurrencyCards() {
+    const grid = document.getElementById('currencyGrid');
+    grid.innerHTML = ''; // Limpar loader
+
+    targetCurrencies.forEach(currency => {
+        // Verifica se a API devolveu taxa para esta moeda
+        if (currentRates[currency.code]) {
+            const card = document.createElement('div');
+            card.className = "bg-light-gray/10 p-3 rounded-xl border border-light-gray/50 flex flex-col justify-between hover:border-gold transition-colors duration-300";
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-xs font-bold text-gray-500 uppercase">${currency.code}</span>
+                    <span class="text-lg grayscale opacity-80">${currency.flag}</span>
+                </div>
+                <div class="text-right">
+                    <span id="val-${currency.code}" class="text-xl font-extrabold text-navy block leading-none">...</span>
+                    <span class="text-[10px] text-gray-400">${currency.name}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    });
+}
+
+function calculateValues(euroValue) {
+    // Se o input estiver vazio ou inválido, assumir 0
+    let amount = parseFloat(euroValue);
+    if (isNaN(amount) || amount < 0) amount = 0;
+
+    targetCurrencies.forEach(currency => {
+        const rate = currentRates[currency.code];
+        if (rate) {
+            const resultElement = document.getElementById(`val-${currency.code}`);
+            if (resultElement) {
+                // Multiplicação simples: Valor Input * Taxa
+                const finalValue = amount * rate;
+                
+                // Formatação bonita (ex: 1,234.56)
+                resultElement.textContent = finalValue.toLocaleString('pt-PT', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+        }
+    });
+}
