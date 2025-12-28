@@ -904,7 +904,9 @@
                     closeModal('limitsModal');
                     document.getElementById('limitForm').reset();
                 } else {
-                    showError('Erro ao criar orçamento');
+                    // Lê a resposta JSON do servidor para saber o erro real
+                    const err = await res.json();
+                    showError(err.error || 'Erro ao criar orçamento');
                 }
             } catch (err) { showError(err.message); }
         });
@@ -1033,7 +1035,7 @@
                     body: JSON.stringify({
                         name: name,
                         target_amount: target, // API espera 'target_amount'
-                        inicial_value: current, 
+                        inicial_value: current,
                         deadline: deadline
                     })
                 });

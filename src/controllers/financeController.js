@@ -107,38 +107,26 @@ export const getBudgets = async (req, res) => {
 };
 
 export const createBudget = async (req, res) => {
-    const { name, amount, period, color } = req.body; 
+    const { name, amount, period, color, category_id } = req.body; 
     const currentMonth = new Date().toISOString().slice(0, 7); 
     const budgetPeriod = period || currentMonth;
 
     try {
-        const { data: categoryData, error: catError } = await supabase
-            .from('categories') 
-            .insert([{ 
-                nome: name,       
-                tipo_movimento: 'expense', 
-                user_id: req.userId,
-                cor: color || '#333333' 
-            }])
-            .select()
-            .single();
-
-        if (catError) throw catError;
 
         const { data: budgetData, error: budgetError } = await supabase
             .from('budgets') 
             .insert([{ 
                 limite: amount,          
                 mes_ano: budgetPeriod,   
-                category_id: categoryData.id, 
+                category_id: category_id, 
                 user_id: req.userId,
-                alert_percentagem: 100 
+                alerta_percentagem: 100 
             }])
             .select();
 
         if (budgetError) throw budgetError;
 
-        res.status(201).json({ ...budgetData[0], categories: categoryData });
+        res.status(201).json({ ...budgetData[0]});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
