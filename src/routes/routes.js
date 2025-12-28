@@ -34,6 +34,7 @@ router.get('/goals', financeController.getGoals);
 router.post('/goals', financeController.createGoal);
 router.put('/goals/:id', financeController.updateGoal); // Nova rota de edição
 router.delete('/goals/:id', financeController.deleteGoal);
+router.post('/goals/:id/contributions', financeController.addGoalContribution); // Nova rota para adicionar contribuição
 
 // --- CATEGORIES ---
 router.get('/categories', financeController.getCategories); // Nova rota de leitura

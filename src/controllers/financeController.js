@@ -450,3 +450,88 @@ export const createCategory = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const addGoalContribution = async (req, res) => {
+    // Agora recebemos também o account_id
+    const { goal_id, amount, date, account_id } = req.body;
+    const userId = req.userId;
+
+    try {
+        // 1. Validação básica
+        if (!goal_id || !amount || amount <= 0 || !account_id) {
+            return res.status(400).json({ error: 'Dados inválidos. Indique a meta, o valor e a conta de origem.' });
+        }
+
+        // 2. Buscar a Conta de Origem e verificar saldo
+        const { data: account, error: accError } = await supabase
+            .from('accounts')
+            .select('*')
+            .eq('id', account_id)
+            .eq('user_id', userId)
+            .single();
+
+        if (accError || !account) {
+            return res.status(404).json({ error: 'Conta de origem não encontrada.' });
+        }
+
+        if (parseFloat(account.saldo_atual) < parseFloat(amount)) {
+            return res.status(400).json({ error: 'Saldo insuficiente na conta selecionada.' });
+        }
+
+        // 3. Buscar a Meta
+        const { data: goal, error: goalError } = await supabase
+            .from('savings_goals')
+            .select('*')
+            .eq('id', goal_id)
+            .eq('user_id', userId)
+            .single();
+
+        if (goalError || !goal) {
+            return res.status(404).json({ error: 'Meta não encontrada.' });
+        }
+
+        // 4. Atualizar Saldo da Conta (Subtrair)
+        const novoSaldoConta = parseFloat(account.saldo_atual) - parseFloat(amount);
+        const { error: updateAccError } = await supabase
+            .from('accounts')
+            .update({ saldo_atual: novoSaldoConta })
+            .eq('id', account_id);
+
+        if (updateAccError) throw updateAccError;
+
+        // 5. Inserir registo na tabela de contribuições
+        // Adicionámos 'account_id' para saber de onde veio o dinheiro
+        const { error: contribError } = await supabase
+            .from('goal_contributions')
+            .insert([{
+                goal_id: goal_id,
+                valor: amount,
+                data: date || new Date(),
+                account_id: account_id // Novo campo
+            }]);
+
+        if (contribError) {
+            // Nota: Em produção, devias usar uma transação SQL para garantir integridade caso isto falhe
+            console.error("Erro ao gravar histórico:", contribError);
+        }
+
+        // 6. Atualizar Valor da Meta (Somar)
+        const novoTotalMeta = (parseFloat(goal.valor_atual) || 0) + parseFloat(amount);
+        const { error: updateGoalError } = await supabase
+            .from('savings_goals')
+            .update({ valor_atual: novoTotalMeta })
+            .eq('id', goal_id);
+
+        if (updateGoalError) throw updateGoalError;
+
+        res.status(200).json({ 
+            message: 'Contribuição registada!', 
+            novo_valor_meta: novoTotalMeta,
+            novo_saldo_conta: novoSaldoConta
+        });
+
+    } catch (error) {
+        console.error("Erro ao contribuir:", error);
+        res.status(500).json({ error: 'Erro interno ao processar contribuição.' });
+    }
+};
