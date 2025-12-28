@@ -88,7 +88,7 @@
                     <div
                         class="flex justify-between items-center px-6 py-4 bg-white border-b border-light-gray sticky top-0 z-10 shadow-sm">
                         <h2 class="text-2xl font-bold">Contas</h2>
-                        <button id="openAccountModal"
+                        <button onclick="openAccountModalHandler()" id="openAccountModal"
                             class="bg-gold text-navy px-5 py-2.5 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md">
                             + Nova conta
                         </button>
@@ -381,9 +381,8 @@
                         <label class="block font-medium mb-2">Tipo</label>
                         <select id="categoryType" required
                             class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
-                            <option value="expense">Apenas despesa</option>
-                            <option value="income">Apenas rendimento</option>
-                            <option value="both">Ambos</option>
+                            <option value="expense">despesa</option>
+                            <option value="income">rendimento</option>
                         </select>
                     </div>
                 </div>
@@ -476,8 +475,48 @@
                 renderGoals();
                 calculateBudgetsProgress(); // Precisa de transactions e budgets carregados
 
+                updateCategorySelects();
+
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
+            }
+        }
+
+        // Função principal para atualizar selects em todo o lado
+        function updateCategorySelects() {
+            // 1. Atualizar Select de Transações (preservando seleção atual se possível)
+            const transType = document.getElementById('transactionType')?.value || 'expense';
+            loadCategoryOptions(transType);
+
+            // 2. Atualizar Select de Limites (preservando seleção atual se possível)
+            const limitSelect = document.getElementById('limitCategory');
+            if (limitSelect) {
+                const currentVal = limitSelect.value;
+                limitSelect.innerHTML = '';
+
+                if (!categories || categories.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = "";
+                    opt.textContent = "Não tem categorias";
+                    opt.disabled = true;
+                    opt.selected = true;
+                    limitSelect.appendChild(opt);
+                } else {
+                    const defaultOpt = document.createElement('option');
+                    defaultOpt.value = "";
+                    defaultOpt.textContent = "Selecione uma categoria";
+                    defaultOpt.disabled = true;
+                    if (!currentVal) defaultOpt.selected = true;
+                    limitSelect.appendChild(defaultOpt);
+
+                    categories.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.nome;
+                        if (c.id === currentVal) opt.selected = true;
+                        limitSelect.appendChild(opt);
+                    });
+                }
             }
         }
 
@@ -554,12 +593,18 @@
                 if (res.ok) fetchAllData();
             } catch (error) { console.error(error); }
         };
-
+        /*
         document.getElementById('openAccountModal').addEventListener('click', () => {
             document.getElementById('accountModalTitle').textContent = 'Nova Conta';
             document.getElementById('accountForm').reset();
             openModal('accountModal');
-        });
+        });*/
+
+        function openAccountModalHandler() {
+            document.getElementById('accountModalTitle').textContent = 'Nova Conta';
+            document.getElementById('accountForm').reset();
+            openModal('accountModal');
+        }
 
 
         // --- GESTÃO DE TRANSAÇÕES ---
@@ -584,7 +629,7 @@
 
             // Filtra categorias se um tipo for passado, senão mostra todas
             const filteredCategories = selectedType
-                ? categories.filter(c => c.type === selectedType || c.type === 'both')
+                ? categories.filter(c => c.tipo_movimento === selectedType)
                 : categories;
 
             filteredCategories.forEach(cat => {
@@ -864,39 +909,6 @@
             } catch (err) { showError(err.message); }
         });
 
-        const originalOpenLimitsModal = document.getElementById('openLimitsModal').onclick;
-        document.getElementById('openLimitsModal').onclick = function () {
-            document.getElementById('limitModalTitle').textContent = 'Novo Orçamento';
-            document.getElementById('limitForm').reset();
-
-            const limitSelect = document.getElementById('limitCategory');
-            limitSelect.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
-            categories.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.nome;
-                limitSelect.appendChild(opt);
-            });
-
-            document.getElementById('limitMonth').value = new Date().getMonth() + 1;
-            document.getElementById('limitYear').value = new Date().getFullYear();
-
-            // Adiciona o botão "Gerir categorias"
-            const categoryDiv = limitSelect.parentElement;
-            if (!categoryDiv.querySelector('.manage-categories-btn')) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'manage-categories-btn mt-3 text-gold underline text-sm hover:text-opacity-80 block';
-                btn.textContent = 'Gerir categorias';
-                btn.onclick = () => {
-                    renderCategoriesList();
-                    openModal('categoriesModal');
-                };
-                categoryDiv.appendChild(btn);
-            }
-
-            openModal('limitsModal');
-        };
 
         // Listener para abrir modal de limites e (opcional) carregar categorias lá também
         document.getElementById('openLimitsModal').addEventListener('click', () => {
@@ -929,6 +941,20 @@
                     opt.textContent = c.nome;
                     limitSelect.appendChild(opt);
                 });
+            }
+
+            // Adiciona o botão "Gerir categorias"
+            const categoryDiv = limitSelect.parentElement;
+            if (!categoryDiv.querySelector('.manage-categories-btn')) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'manage-categories-btn mt-3 text-gold underline text-sm hover:text-opacity-80 block';
+                btn.textContent = 'Gerir categorias';
+                btn.onclick = () => {
+                    renderCategoriesList();
+                    openModal('categoriesModal');
+                };
+                categoryDiv.appendChild(btn);
             }
 
             // Define data padrão
@@ -998,6 +1024,7 @@
             const name = document.getElementById('goalName').value;
             const target = parseFloat(document.getElementById('goalTarget').value);
             const deadline = document.getElementById('goalDeadline').value;
+            const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
 
             try {
                 const res = await fetch('/api/goals', {
@@ -1006,6 +1033,7 @@
                     body: JSON.stringify({
                         name: name,
                         target_amount: target, // API espera 'target_amount'
+                        inicial_value: current, 
                         deadline: deadline
                     })
                 });
@@ -1045,12 +1073,11 @@
             }
 
             categories.forEach(cat => {
-                const typeLabel = cat.type === 'expense' ? 'Despesa' :
-                    cat.type === 'income' ? 'Rendimento' :
-                        'Ambos';
+                // Depois (Corrigido):
+                const typeLabel = cat.tipo_movimento === 'expense' ? 'Despesa' : 'Rendimento';
 
-                const typeColor = cat.type === 'expense' ? 'text-red-600' :
-                    cat.type === 'income' ? 'text-green-600' :
+                const typeColor = cat.tipo_movimento === 'expense' ? 'text-red-600' :
+                    cat.tipo_movimento === 'income' ? 'text-green-600' :
                         'text-gold';
 
                 const div = document.createElement('div');
@@ -1123,10 +1150,10 @@
             e.preventDefault();
 
             const id = document.getElementById('categoryId').value;
-            const nome = document.getElementById('categoryName').value.trim();
+            const name = document.getElementById('categoryName').value.trim();
             const type = document.getElementById('categoryType').value;
 
-            if (!nome) return alert('O nome da categoria é obrigatório.');
+            if (!name) return alert('O nome da categoria é obrigatório.');
 
             try {
                 const method = id ? 'PUT' : 'POST';
@@ -1135,7 +1162,7 @@
                 const res = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, type })
+                    body: JSON.stringify({ name: name, type: type })
                 });
 
                 if (res.ok) {

@@ -360,7 +360,7 @@ export const getGoals = async (req, res) => {
 };
 
 export const createGoal = async (req, res) => {
-    const { name, target_amount, deadline } = req.body;
+    const { name, target_amount, inicial_value, deadline } = req.body;
 
     try {
         const { data, error } = await supabase
@@ -368,7 +368,7 @@ export const createGoal = async (req, res) => {
             .insert([{ 
                 nome: name, 
                 valor_alvo: target_amount,   
-                valor_atual: 0,             
+                valor_atual: inicial_value || 0,             
                 data_alvo: deadline,         
                 status: 'ativo',
                 user_id: req.userId 
