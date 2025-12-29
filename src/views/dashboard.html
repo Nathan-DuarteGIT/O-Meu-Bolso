@@ -158,8 +158,7 @@
                         </div>
                     </div>
 
-                    <div id="currencyGrid"
-                        class="grid grid-cols-2 gap-3 overflow-hidden max-h-80 pr-1 ">
+                    <div id="currencyGrid" class="grid grid-cols-2 gap-3 overflow-hidden max-h-80 pr-1 ">
                         <div class="col-span-2 text-center text-gray-400 py-4">
                             A carregar taxas...
                         </div>
@@ -279,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Modal: Limites Mensais -->
+    <!-- Modal Limites Mensais -->
     <div id="limitsModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
             <h3 id="limitModalTitle" class="text-2xl font-bold text-navy mb-6">Configurar Limite</h3>
@@ -424,6 +423,50 @@
             <div class="mt-6 text-center text-sm text-gray-500">
                 As categorias aqui criadas aparecem automaticamente nas transações e limites.
             </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Adicionar Contribuição a uma Meta -->
+    <div id="contributionModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-navy">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Adicionar à Meta</h3>
+                <button onclick="closeModal('contributionModal')"
+                    class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="contributionForm">
+                <input type="hidden" id="contributionGoalId" value="">
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Meta</label>
+                    <p id="contributionGoalName" class="font-semibold text-lg text-gold"></p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Valor da contribuição (€)</label>
+                    <input type="number" id="contributionAmount" step="0.01" min="0.01" required placeholder="ex: 50.00"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">Data da contribuição</label>
+                    <input type="date" id="contributionDate"
+                        class="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:border-gold">
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('contributionModal')"
+                        class="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-light-gray transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gold font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+                        Adicionar Dinheiro
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
