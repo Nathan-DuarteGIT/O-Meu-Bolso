@@ -668,6 +668,91 @@ document.getElementById('openGoalModal').addEventListener('click', () => {
     openModal('goalModal');
 });
 
+// --- GESTÃO DE CONTRIBUIÇÕES PARA METAS ---
+
+// 1. Função para Abrir o Modal de Contribuição
+window.openContributionModal = function(id, name) {
+    // Preenche os dados ocultos e visuais
+    document.getElementById('contributionGoalId').value = id;
+    document.getElementById('contributionGoalName').textContent = name;
+    
+    // Define a data de hoje como padrão
+    document.getElementById('contributionDate').value = new Date().toISOString().split('T')[0];
+    
+    // Limpa o valor anterior
+    document.getElementById('contributionAmount').value = '';
+
+    // Carregar as contas no Select (Reutilizando a variável global 'accounts')
+    const accountSelect = document.getElementById('contributionAccount');
+    accountSelect.innerHTML = '<option value="">Selecione a conta de origem</option>';
+
+    if (accounts && accounts.length > 0) {
+        accounts.forEach(acc => {
+            const opt = document.createElement('option');
+            opt.value = acc.id;
+            // Mostra o nome e o saldo disponível para ajudar o utilizador
+            opt.textContent = `${acc.nome} (Disp: €${parseFloat(acc.saldo_atual).toFixed(2)})`;
+            accountSelect.appendChild(opt);
+        });
+    } else {
+        const opt = document.createElement('option');
+        opt.textContent = "Sem contas registadas";
+        accountSelect.appendChild(opt);
+    }
+
+    // Abre o modal
+    openModal('contributionModal');
+};
+
+// 2. Submissão do Formulário de Contribuição
+document.getElementById('contributionForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const goalId = document.getElementById('contributionGoalId').value;
+    const accountId = document.getElementById('contributionAccount').value;
+    const amount = parseFloat(document.getElementById('contributionAmount').value);
+    const date = document.getElementById('contributionDate').value;
+
+    // Validações básicas
+    if (!accountId) {
+        alert("Por favor, selecione a conta de onde sairá o dinheiro.");
+        return;
+    }
+    if (amount <= 0) {
+        alert("O valor deve ser maior que zero.");
+        return;
+    }
+
+    try {
+        // Nota: A rota no routes.js é '/goals/:id/contributions'
+        // O controller espera { goal_id, amount, date, account_id } no body
+        const res = await fetch(`/api/goals/${goalId}/contributions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                goal_id: goalId,    // Redundante mas seguro para o controller
+                account_id: accountId,
+                amount: amount,
+                date: date
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            // Sucesso!
+            
+            await fetchAllData(); // Recarrega tudo (Saldos das contas e progresso das metas)
+            closeModal('contributionModal');
+            document.getElementById('contributionForm').reset();
+        } else {
+            const err = await res.json();
+            showError(err.error || 'Erro ao adicionar contribuição');
+        }
+    } catch (error) {
+        showError(error.message);
+    }
+});
+
 // Função para carregar e renderizar a lista de categorias no modal
 function renderCategoriesList() {
     const list = document.getElementById('categoriesList');
